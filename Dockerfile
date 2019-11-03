@@ -15,7 +15,9 @@ RUN apk --update add --no-cache bash ca-certificates dbus  su-exec tzdata       
     wget -nv -O /usr/local/bin/duplicacy_web                                           \
         https://acrosync.com/duplicacy-web/duplicacy_web_linux_arm_${DUPLICACY_WEB_VERSION} 2>&1 && \
     chmod +x /usr/local/bin/duplicacy_web                                           && \
-    rm -f /var/lib/dbus/machine-id && ln -s /config/machine-id /var/lib/dbus/machine-id
+    rm -f /var/lib/dbus/machine-id && ln -s /config/machine-id /var/lib/dbus/machine-id && \
+    chmod 774 /root/.duplicacy-web/bin/duplicacy                                    && \
+    chmod 774 /root/.duplicacy-web/bin/duplicacy_web
 
 EXPOSE 3875/tcp
 VOLUME /config /logs /cache

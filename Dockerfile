@@ -8,7 +8,7 @@ ENV DUPLICACY_WEB_VERSION=1.1.0
 ENV USR_ID=0 \
     GRP_ID=0
 
-ENV TZ="America/Los_Angeles"
+ENV TZ="Europe/Paris"
 
 # Installing software
 RUN apk --update add --no-cache bash ca-certificates dbus  su-exec tzdata           && \

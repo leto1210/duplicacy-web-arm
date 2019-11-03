@@ -1,4 +1,4 @@
-FROM alpine:latest
+FROM arm32v7/alpine:latest
 
 ENV DUPLICACY_WEB_VERSION=1.1.0
 

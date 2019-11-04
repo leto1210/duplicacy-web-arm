@@ -1,4 +1,4 @@
-#!/usr/bin/env bash  
+#!/usr/bin/env bash
 
 echo duplicacy_web runing as user $(id -un):$(id -gn)\($(id -u):$(id -g)\)
 
@@ -7,6 +7,8 @@ if [ ! -d ~/.duplicacy-web ]; then
 fi
 
 touch /logs/duplicacy_web.log
+
+chmod +x /home/duplicacy/.duplicacy-web/bin/duplicacy_linux_arm_*
 
 if [ ! -f /config/settings.json ]; then
     echo '{
@@ -21,8 +23,7 @@ if [ ! -f /config/duplicacy.json ]; then
 fi
 
 echo "Logging tail of the log from this moment on"
-tail -0 -f /logs/duplicacy_web.log & 
+tail -0 -f /logs/duplicacy_web.log &
 
 echo "Starting duplicacy"
-exec duplicacy_web 
-
+exec duplicacy_web

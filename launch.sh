@@ -8,8 +8,6 @@ fi
 
 touch /logs/duplicacy_web.log
 
-chmod +x /home/duplicacy/.duplicacy-web/bin/duplicacy_linux_arm_*
-
 if [ ! -f /config/settings.json ]; then
     echo '{
         "listening_address"     : "0.0.0.0:3875",

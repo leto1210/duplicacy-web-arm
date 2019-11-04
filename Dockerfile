@@ -15,9 +15,9 @@ ENV TZ="Europe/Paris"
 RUN apk --update add --no-cache bash ca-certificates dbus su-exec tzdata
 RUN wget -nv -O /usr/local/bin/duplicacy_web https://acrosync.com/duplicacy-web/duplicacy_web_linux_arm_${DUPLICACY_WEB_VERSION} 2>&1 && \
     chmod +x /usr/local/bin/duplicacy_web && \
-    rm -f /var/lib/dbus/machine-id && ln -s /config/machine-id /var/lib/dbus/machine-id
-#RUN wget -nv https://github.com/gilbertchen/duplicacy/releases/download/v${DUPLICACY_VERSION}/duplicacy_linux_arm_${DUPLICACY_VERSION} && \
-#    chmod 774 duplicacy_linux_arm_${DUPLICACY_VERSION}
+    rm -f /var/lib/dbus/machine-id && ln -s /config/machine-id /var/lib/dbus/machine-id && \
+    wget -nv -O /usr/local/bin/duplicacy https://github.com/gilbertchen/duplicacy/releases/download/v${DUPLICACY_VERSION}/duplicacy_linux_arm_${DUPLICACY_VERSION} 2>&1 && \
+    chmod +x /usr/local/bin/duplicacy
 
 EXPOSE 3875/tcp
 VOLUME /config /logs /cache

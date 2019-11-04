@@ -18,8 +18,8 @@ RUN wget -nv -O /usr/local/bin/duplicacy_web https://acrosync.com/duplicacy-web/
     #mkdir -p /root/.duplicacy-web/bin && \
     #chmod 777 /root/.duplicacy-web/bin && \
     rm -f /var/lib/dbus/machine-id && ln -s /config/machine-id /var/lib/dbus/machine-id
-RUN wget -nv https://github.com/gilbertchen/duplicacy/releases/download/v${DUPLICACY_VERSION}/duplicacy_linux_arm64_${DUPLICACY_VERSION} && \
-    chmod 774 duplicacy_linux_arm64_${DUPLICACY_VERSION}
+#RUN wget -nv https://github.com/gilbertchen/duplicacy/releases/download/v${DUPLICACY_VERSION}/duplicacy_linux_arm_${DUPLICACY_VERSION} && \
+#    chmod 774 duplicacy_linux_arm_${DUPLICACY_VERSION}
 
 EXPOSE 3875/tcp
 VOLUME /config /logs /cache

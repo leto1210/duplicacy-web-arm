@@ -1,7 +1,7 @@
 FROM arm32v7/alpine:latest
 
 ENV DUPLICACY_WEB_VERSION=1.1.0
-ENV DUPLICACY_VERSION=2.2.3
+ENV DUPLICACY_VERSION=2.3.0
 
 # Set to actual USR_ID and GRP_ID of the user this should run under
 # Uses root by default, unless changed

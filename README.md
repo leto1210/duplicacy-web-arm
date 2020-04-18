@@ -1,6 +1,8 @@
 # Duplicacy web container for ARM
 
 
+[![Build Status](https://travis-ci.org/leto1210/duplicacy-web-arm.svg?branch=master)](https://travis-ci.org/github/leto1210/duplicacy-web-arm)
+
 
 Based on [saspus/duplicacy-web](https://bitbucket.org/saspus/duplicacy-web-docker-container/src/master/)
 

@@ -1,6 +1,6 @@
 FROM arm32v7/alpine:latest
 
-ENV DUPLICACY_WEB_VERSION=1.3.0
+ENV DUPLICACY_WEB_VERSION=1.4.0
 ENV DUPLICACY_VERSION=2.6.1
 
 # Set to actual USR_ID and GRP_ID of the user this should run under

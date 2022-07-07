@@ -1,5 +1,4 @@
-#FROM arm32v7/alpine:3.12
-FROM arm32v7/debian:stable-slim
+FROM arm32v7/alpine:3.12
 
 ENV DUPLICACY_WEB_VERSION=1.6.3
 ENV DUPLICACY_VERSION=2.7.2

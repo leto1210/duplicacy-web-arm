@@ -11,7 +11,8 @@ arch:
 #   - os: linux
 #     arch: arm64
 before_install:
-  - sudo './.travis/main.sh'
+  - chmod +x ./.travis/main.sh
+  - './.travis/main.sh'
 
 before_script:
   - git clone https://github.com/leto1210/duplicacy-web-arm.git

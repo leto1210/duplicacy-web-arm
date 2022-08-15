@@ -1,6 +1,6 @@
 language: minimal
 services: docker
-dist: focal
+dist: bionic
 #sudo: 'required'
 
 arch:

@@ -29,7 +29,7 @@ setup_dependencies() {
   "
 
   sudo apt update -y
-  sudo apt install -y docker.io=20.10.7-0ubuntu2~20.04.1
+  sudo apt install -y docker.ce=20.10.7-0ubuntu2~20.04.1
 
   docker info
 }

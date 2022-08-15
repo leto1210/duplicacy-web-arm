@@ -18,7 +18,7 @@ ENV TZ="Europe/Paris"
 
 # Installing software
 #RUN apt-get update && apt-get install -y ca-certificates dbus tzdata wget
-RUN apk --update
+RUN apk update
 RUN apk add --no-cache bash
 RUN apk add --no-cache ca-certificates
 RUN apk add --no-cache dbus

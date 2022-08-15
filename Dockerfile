@@ -1,5 +1,7 @@
 
-FROM arm32v7/debian:11.4
+# FROM arm32v7/debian:11.4
+FROM arm32v7/alpine:3.12
+
 LABEL maintainer="leto1210"
 LABEL org.label-schema.vcs-url="e.g. https://github.com/leto1210/duplicacy-web-arm"
 
@@ -15,7 +17,8 @@ ENV USR_ID=0 \
 ENV TZ="Europe/Paris"
 
 # Installing software
-RUN apt-get update && apt-get install -y ca-certificates dbus tzdata wget
+#RUN apt-get update && apt-get install -y ca-certificates dbus tzdata wget
+RUN apk --update add --no-cache bash ca-certificates dbus su-exec tzdata
 RUN wget -nv -O /usr/local/bin/duplicacy_web https://acrosync.com/duplicacy-web/duplicacy_web_linux_arm_${DUPLICACY_WEB_VERSION} 2>&1 && \
     chmod +x /usr/local/bin/duplicacy_web && \
     rm -f /var/lib/dbus/machine-id && ln -s /config/machine-id /var/lib/dbus/machine-id && \
@@ -23,11 +26,11 @@ RUN wget -nv -O /usr/local/bin/duplicacy_web https://acrosync.com/duplicacy-web/
     chmod +x /usr/local/bin/duplicacy
 
 # Reduce  container size
-RUN apt-get remove wget -y && \
-    apt-get clean autoclean && \
-    apt-get autoremove -y && \
-    rm -rf /var/lib/apt/lists/* && \
-    rm -rf /tmp/*
+#RUN apt-get remove wget -y && \
+#    apt-get clean autoclean && \
+#    apt-get autoremove -y && \
+#    rm -rf /var/lib/apt/lists/* && \
+#    rm -rf /tmp/*
 
 EXPOSE 3875/tcp
 VOLUME /config /logs /cache

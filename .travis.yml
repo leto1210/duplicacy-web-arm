@@ -1,7 +1,7 @@
 language: minimal
 services: docker
 dist: focal
-sudo: 'required'
+#sudo: 'required'
 
 arch:
   - arm64

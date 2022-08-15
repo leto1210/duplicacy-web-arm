@@ -1,6 +1,6 @@
 
 # FROM arm32v7/debian:11.4
-FROM arm32v7/alpine:3.12
+FROM arm32v7/alpine:latest
 
 LABEL maintainer="leto1210"
 LABEL org.label-schema.vcs-url="e.g. https://github.com/leto1210/duplicacy-web-arm"

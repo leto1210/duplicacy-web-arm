@@ -18,7 +18,12 @@ ENV TZ="Europe/Paris"
 
 # Installing software
 #RUN apt-get update && apt-get install -y ca-certificates dbus tzdata wget
-RUN apk --update add --no-cache bash ca-certificates dbus su-exec tzdata
+RUN apk --update
+RUN apk add --no-cache bash
+RUN apk add --no-cache ca-certificates
+RUN apk add --no-cache dbus
+RUN apk add --no-cache su-exec
+RUN apk add --no-cache tzdata
 RUN wget -nv -O /usr/local/bin/duplicacy_web https://acrosync.com/duplicacy-web/duplicacy_web_linux_arm_${DUPLICACY_WEB_VERSION} 2>&1 && \
     chmod +x /usr/local/bin/duplicacy_web && \
     rm -f /var/lib/dbus/machine-id && ln -s /config/machine-id /var/lib/dbus/machine-id && \

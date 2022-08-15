@@ -1,5 +1,6 @@
 language: minimal
 services: docker
+dist: bionic
 
 arch:
   - arm64

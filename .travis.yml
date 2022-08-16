@@ -28,11 +28,11 @@ script:
   - docker push $DOCKER_USERNAME/duplicacy-web-arm:${COMMIT}
   # Build report
   - echo duplicacy-web-arm:${COMMIT}
-  - ./trivy --exit-code 0 --cache-dir .trivycache/ --no-progress --format template --template "@contrib/gitlab.tpl" -o gl-container-scanning-report.json leto1210/duplicacy-web-arm:${COMMIT}
+  - ./trivy --exit-code 0 --cache-dir .trivycache/ --no-progress --format template --template "@contrib/gitlab.tpl" -o gl-container-scanning-report.json $DOCKER_USERNAME/duplicacy-web-arm:${COMMIT}
   # Print report
-  - ./trivy --exit-code 0 --cache-dir .trivycache/ --no-progress --severity HIGH leto1210/duplicacy-web-arm:${COMMIT}
+  - ./trivy --exit-code 0 --cache-dir .trivycache/ --no-progress --severity HIGH $DOCKER_USERNAME/duplicacy-web-arm:${COMMIT}
   # Fail on critical vulnerability
-  - ./trivy --exit-code 1 --cache-dir .trivycache/ --severity CRITICAL --no-progress leto1210/duplicacy-web-arm:${COMMIT}
+  - ./trivy --exit-code 1 --cache-dir .trivycache/ --severity CRITICAL --no-progress $DOCKER_USERNAME/duplicacy-web-arm:${COMMIT}
 
 cache:
   paths:
@@ -40,6 +40,6 @@ cache:
 
 after_success:
   - echo "$DOCKER_PASS" | docker login -u "$DOCKER_USERNAME" --password-stdin
-  - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else (echo $TRAVIS_BRANCH) ; fi`
+  - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else (echo ${COMMIT}) ; fi`
   - docker build -t $DOCKER_USERNAME/duplicacy-web-arm:$TAG .
   - docker push $DOCKER_USERNAME/duplicacy-web-arm:$TAG

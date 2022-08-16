@@ -5,6 +5,10 @@ dist: bionic
 arch:
   - arm64
 
+env:
+  global:
+    - COMMIT=${TRAVIS_COMMIT::8}
+
 before_install:
   - chmod +x ./.travis/main.sh
   - './.travis/main.sh'
@@ -24,11 +28,11 @@ script:
   - export TRAVIS_BUILD_NUMBER="$TRAVIS_BUILD_NUMBER"
   - docker push $DOCKER_USERNAME/duplicacy-web-arm:$TRAVIS_BUILD_NUMBER
   # Build report
-  - ./trivy --exit-code 0 --cache-dir .trivycache/ --no-progress --format template --template "@contrib/gitlab.tpl" -o gl-container-scanning-report.json $TRAVIS_BUILD_NUMBER
+  - ./trivy --exit-code 0 --cache-dir .trivycache/ --no-progress --format template --template "@contrib/gitlab.tpl" -o gl-container-scanning-report.json duplicacy-web-arm:$TRAVIS_BUILD_NUMBER
   # Print report
-  - ./trivy --exit-code 0 --cache-dir .trivycache/ --no-progress --severity HIGH $TRAVIS_BUILD_NUMBER
+  - ./trivy --exit-code 0 --cache-dir .trivycache/ --no-progress --severity HIGH duplicacy-web-arm:$TRAVIS_BUILD_NUMBER
   # Fail on critical vulnerability
-  - ./trivy --exit-code 1 --cache-dir .trivycache/ --severity CRITICAL --no-progress $TRAVIS_BUILD_NUMBER
+  - ./trivy --exit-code 1 --cache-dir .trivycache/ --severity CRITICAL --no-progress duplicacy-web-arm:$TRAVIS_BUILD_NUMBER
 cache:
   paths:
     - .trivycache/

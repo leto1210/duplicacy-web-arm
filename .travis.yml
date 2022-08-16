@@ -21,7 +21,7 @@ script:
   - docker build -t $DOCKER_USERNAME/duplicacy-web-arm:$TRAVIS_BUILD_NUMBER .
   - docker images
   - echo "$DOCKER_PASS" | docker login -u "$DOCKER_USERNAME" --password-stdin
-  - export TRAVIS_BUILD_NUMBER=$TRAVIS_BUILD_NUMBER
+  - export TRAVIS_BUILD_NUMBER="$TRAVIS_BUILD_NUMBER"
   - docker push $DOCKER_USERNAME/duplicacy-web-arm:$TRAVIS_BUILD_NUMBER
   # Build report
   - ./trivy --exit-code 0 --cache-dir .trivycache/ --no-progress --format template --template "@contrib/gitlab.tpl" -o gl-container-scanning-report.json $TRAVIS_BUILD_NUMBER

@@ -28,12 +28,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
       - name: Sleep Action
-  # You may pin to the exact commit or the version.
-  # uses: juliangruber/sleep-action@61b118a54bde77a381ddb5190a0d13ee2d056410
-  uses: juliangruber/sleep-action@v1.0.1
-  with:
-    # A time period as ms or string (100, 10s, 1m)
-    time: # 5m
+        uses: akejarvis/wait-action@v0.1.1
+        with:
+         time: 5m
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@7b7aa264d83dc58691451798b4d117d53d21edfe
         with:

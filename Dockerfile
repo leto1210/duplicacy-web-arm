@@ -17,6 +17,7 @@ ENV USR_ID=0 \
 ENV TZ="Europe/Paris"
 
 # Installing software
+
 #RUN apt-get update && apt-get install -y ca-certificates dbus tzdata wget
 RUN apk update
 RUN apk add --no-cache bash
@@ -31,6 +32,7 @@ RUN wget -nv -O /usr/local/bin/duplicacy_web https://acrosync.com/duplicacy-web/
     chmod +x /usr/local/bin/duplicacy
 
 # Reduce  container size
+
 #RUN apt-get remove wget -y && \
 #    apt-get clean autoclean && \
 #    apt-get autoremove -y && \

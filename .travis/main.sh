@@ -32,7 +32,7 @@ setup_dependencies() {
   cp ./.travis/default.json /tmp/default.json
   echo \
   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-  #$(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
   sudo apt update -y
   #sudo apt upgrade docker-ce -y
   sudo apt install -y docker-ce=19.03.9

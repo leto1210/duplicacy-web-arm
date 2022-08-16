@@ -28,6 +28,7 @@ script:
   - export TRAVIS_BUILD_NUMBER="$TRAVIS_BUILD_NUMBER"
   - docker push $DOCKER_USERNAME/duplicacy-web-arm:$TRAVIS_BUILD_NUMBER
   # Build report
+  - echo duplicacy-web-arm:$TRAVIS_BUILD_NUMBER
   - ./trivy --exit-code 0 --cache-dir .trivycache/ --no-progress --format template --template "@contrib/gitlab.tpl" -o gl-container-scanning-report.json duplicacy-web-arm:$TRAVIS_BUILD_NUMBER
   # Print report
   - ./trivy --exit-code 0 --cache-dir .trivycache/ --no-progress --severity HIGH duplicacy-web-arm:$TRAVIS_BUILD_NUMBER

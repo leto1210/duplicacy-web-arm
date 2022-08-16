@@ -1,13 +1,13 @@
 language: minimal
 services: docker
+dist: bionic
 
 arch:
   - arm64
 
-#matrix:
-#  include:
-#   - os: linux
-#     arch: arm64
+before_install:
+  - chmod +x ./.travis/main.sh
+  - './.travis/main.sh'
 
 before_script:
   - git clone https://github.com/leto1210/duplicacy-web-arm.git

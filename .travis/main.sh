@@ -35,7 +35,7 @@ setup_dependencies() {
   #$(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
   sudo apt update -y
   #sudo apt upgrade docker-ce -y
-  sudo apt install -y docker-ce=19.03.9~3-0~ubuntu-focal
+  sudo apt install -y docker-ce=19.03.9*
 
   docker info
 }

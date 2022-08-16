@@ -22,18 +22,18 @@ before_script:
 
 
 script:
-  - docker build -t $DOCKER_USERNAME/duplicacy-web-arm:$TRAVIS_BUILD_NUMBER .
+  - docker build -t $DOCKER_USERNAME/duplicacy-web-arm:${COMMIT} .
   - docker images
   - echo "$DOCKER_PASS" | docker login -u "$DOCKER_USERNAME" --password-stdin
-  - export TRAVIS_BUILD_NUMBER="$TRAVIS_BUILD_NUMBER"
-  - docker push $DOCKER_USERNAME/duplicacy-web-arm:$TRAVIS_BUILD_NUMBER
+  - docker push $DOCKER_USERNAME/duplicacy-web-arm:${COMMIT}
   # Build report
-  - echo duplicacy-web-arm:$TRAVIS_BUILD_NUMBER
-  - ./trivy --exit-code 0 --cache-dir .trivycache/ --no-progress --format template --template "@contrib/gitlab.tpl" -o gl-container-scanning-report.json duplicacy-web-arm:$TRAVIS_BUILD_NUMBER
+  - echo duplicacy-web-arm:${COMMIT}
+  - ./trivy --exit-code 0 --cache-dir .trivycache/ --no-progress --format template --template "@contrib/gitlab.tpl" -o gl-container-scanning-report.json leto1210/duplicacy-web-arm:${COMMIT}
   # Print report
-  - ./trivy --exit-code 0 --cache-dir .trivycache/ --no-progress --severity HIGH duplicacy-web-arm:$TRAVIS_BUILD_NUMBER
+  - ./trivy --exit-code 0 --cache-dir .trivycache/ --no-progress --severity HIGH leto1210/duplicacy-web-arm:${COMMIT}
   # Fail on critical vulnerability
-  - ./trivy --exit-code 1 --cache-dir .trivycache/ --severity CRITICAL --no-progress duplicacy-web-arm:$TRAVIS_BUILD_NUMBER
+  - ./trivy --exit-code 1 --cache-dir .trivycache/ --severity CRITICAL --no-progress leto1210/duplicacy-web-arm:${COMMIT}
+
 cache:
   paths:
     - .trivycache/

@@ -23,11 +23,11 @@ script:
   - echo "$DOCKER_PASS" | docker login -u "$DOCKER_USERNAME" --password-stdin
   - docker push $DOCKER_USERNAME/duplicacy-web-arm:$TRAVIS_BUILD_NUMBER
   # Build report
-  - ./trivy --exit-code 0 --cache-dir .trivycache/ --no-progress --format template --template "@contrib/gitlab.tpl" -o gl-container-scanning-report.json $IMAGE
+  - ./trivy --exit-code 0 --cache-dir .trivycache/ --no-progress --format template --template "@contrib/gitlab.tpl" -o gl-container-scanning-report.json $TRAVIS_BUILD_NUMBER
   # Print report
-  - ./trivy --exit-code 0 --cache-dir .trivycache/ --no-progress --severity HIGH $IMAGE
+  - ./trivy --exit-code 0 --cache-dir .trivycache/ --no-progress --severity HIGH $TRAVIS_BUILD_NUMBER
   # Fail on critical vulnerability
-  - ./trivy --exit-code 1 --cache-dir .trivycache/ --severity CRITICAL --no-progress $IMAGE
+  - ./trivy --exit-code 1 --cache-dir .trivycache/ --severity CRITICAL --no-progress $TRAVIS_BUILD_NUMBER
 cache:
   paths:
     - .trivycache/

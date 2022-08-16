@@ -24,17 +24,14 @@ main() {
 # Takes care of updating any dependencies that the
 # machine needs.
 setup_dependencies() {
-  echo "INFO:
-  Setting up dependencies.
-  "
+  echo " INFO:Setting up dependencies. "
   sudo mkdir -p /etc/apt/keyrings
   curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-  cp ./.travis/default.json /tmp/default.json
-  echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
   $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+#Upgrade Docker version for avoid Alpine Seccomp bug
   sudo apt update -y
-  #sudo apt upgrade docker-ce -y
   sudo apt install -y docker-ce
 
   docker info

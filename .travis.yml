@@ -2,9 +2,6 @@ language: minimal
 services: docker
 dist: bionic
 
-ignore:
-  - .github/*
-
 arch:
   - arm64
 
@@ -31,11 +28,12 @@ script:
   - docker push $DOCKER_USERNAME/duplicacy-web-arm:${COMMIT}
   # Build report
   - echo duplicacy-web-arm:${COMMIT}
-  - ./trivy --exit-code 0 --cache-dir .trivycache/ --no-progress --format template --template "@contrib/gitlab.tpl" -o gl-container-scanning-report.json $DOCKER_USERNAME/duplicacy-web-arm:${COMMIT}
+  - ./trivy image $DOCKER_USERNAME/duplicacy-web-arm:${COMMIT} --exit-code 0 --cache-dir .trivycache/ --no-progress --format template --template "@contrib/gitlab.tpl" -o gl-container-scanning-report.json
+  #- ./trivy --exit-code 0 --cache-dir .trivycache/ --no-progress --format template --template "@contrib/gitlab.tpl" -o gl-container-scanning-report.json $DOCKER_USERNAME/duplicacy-web-arm:${COMMIT}
   # Print report
-  - ./trivy --exit-code 0 --cache-dir .trivycache/ --no-progress --severity HIGH $DOCKER_USERNAME/duplicacy-web-arm:${COMMIT}
+  #- ./trivy --exit-code 0 --cache-dir .trivycache/ --no-progress --severity HIGH $DOCKER_USERNAME/duplicacy-web-arm:${COMMIT}
   # Fail on critical vulnerability
-  - ./trivy --exit-code 1 --cache-dir .trivycache/ --severity CRITICAL --no-progress $DOCKER_USERNAME/duplicacy-web-arm:${COMMIT}
+  #- ./trivy --exit-code 1 --cache-dir .trivycache/ --severity CRITICAL --no-progress $DOCKER_USERNAME/duplicacy-web-arm:${COMMIT}
 
 cache:
   paths:

@@ -2,6 +2,9 @@ language: minimal
 services: docker
 dist: bionic
 
+ignore:
+  - .github/*
+
 arch:
   - arm64
 

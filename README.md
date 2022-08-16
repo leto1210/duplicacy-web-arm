@@ -2,9 +2,10 @@
 
 
 [![Build Status](https://travis-ci.com/leto1210/duplicacy-web-arm.svg?branch=master)](https://travis-ci.com/github/leto1210/duplicacy-web-arm)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)]
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Docker Pulls](https://img.shields.io/docker/pulls/leto1210/duplicacy-web-arm)
-![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/leto1210/duplicacy-web-arm/build/master)
+[![Build security check](https://github.com/leto1210/duplicacy-web-arm/actions/workflows/trivy.yml/badge.svg)](https://github.com/leto1210/duplicacy-web-arm/actions/workflows/trivy.yml)
+[![Dependency Review](https://github.com/leto1210/duplicacy-web-arm/actions/workflows/dependency-review.yml/badge.svg?branch=master)](https://github.com/leto1210/duplicacy-web-arm/actions/workflows/dependency-review.yml)
 
 Based on [saspus/duplicacy-web](https://bitbucket.org/saspus/duplicacy-web-docker-container/src/master/)
 

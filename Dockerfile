@@ -5,7 +5,7 @@ LABEL maintainer="leto1210"
 LABEL org.label-schema.vcs-url="e.g. https://github.com/leto1210/duplicacy-web-arm"
 
 ENV DUPLICACY_WEB_VERSION=1.6.3
-ENV DUPLICACY_VERSION=2.7.2
+ENV DUPLICACY_VERSION=3.0.1
 
 # Set to actual USR_ID and GRP_ID of the user this should run under
 # Uses root by default, unless changed

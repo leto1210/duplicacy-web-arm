@@ -1,5 +1,5 @@
 
-FROM arm32v7/alpine:3.17.2
+FROM arm32v7/alpine:3.17.3
 
 LABEL maintainer="leto1210"
 LABEL org.label-schema.vcs-url="e.g. https://github.com/leto1210/duplicacy-web-arm"

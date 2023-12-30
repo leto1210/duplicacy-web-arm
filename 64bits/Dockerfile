@@ -1,5 +1,5 @@
 
-FROM arm64v8/alpine:3.19.0 AS 64bits
+FROM arm64v8/alpine:3.19.0
 
 
 LABEL maintainer="leto1210"

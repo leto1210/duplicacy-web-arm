@@ -46,12 +46,12 @@ jobs:
         with:
           image-ref: 'docker.io/leto1210/duplicacy-web-arm:${{ env.sha }}'
           format: 'sarif'
-          output: 'trivy-results.sarif'
+          output: 'duplicacy-web-arm_trivy-results.sarif'
           severity: 'CRITICAL,HIGH'
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v2
         if: always()
         with:
-          sarif_file: 'trivy-results.sarif'
+          sarif_file: 'duplicacy-web-arm_trivy-results.sarif'
           severity: 'CRITICAL,HIGH'

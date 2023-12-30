@@ -1,4 +1,4 @@
-name: Docker Image CI 64 bits
+name: Docker Image CI 64 bits only
 
 on:
   push:
@@ -37,7 +37,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
             push: true
-            tags: leto1210/duplicacy-web-arm:${{ steps.short-sha.outputs.sha }}
+            tags: leto1210/duplicacy-web-arm:${{ steps.short-sha.outputs.sha }}, leto1210/duplicacy-web-arm:arm64
             file: ./64bits/Dockerfile
             platforms: linux/arm64
       - name: Build and push with latest tag

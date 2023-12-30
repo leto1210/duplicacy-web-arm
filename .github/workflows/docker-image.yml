@@ -1,4 +1,4 @@
-name: Docker Image CI 32 bits
+name: Docker Image CI 32 bits and 64 bits
 
 on:
   push:
@@ -10,8 +10,8 @@ jobs:
 
   build:
     runs-on: self-hosted
-    env:
-      DOCKER_TARGET_PLATFORM: linux/arm/v7
+    # env:
+    #   DOCKER_TARGET_PLATFORM: linux/arm/v7
 
     steps:
       - name: Checkout code

@@ -9,7 +9,10 @@
 
 Based on [saspus/duplicacy-web](https://bitbucket.org/saspus/duplicacy-web-docker-container/src/master/)
 
-By default the "latest" tag on docker hub is form arm32v7 version. if you need the 64bits version, you must choose it explicitly
+## ARMv7 or ARMv8 ?
+
+By default the "latest" tag on docker hub is for the arm32v7 version.
+If you need the 64bits version, you must choose it explicitly
 
 ## How To
 

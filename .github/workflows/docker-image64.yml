@@ -38,7 +38,7 @@ jobs:
         with:
             push: true
             tags: leto1210/duplicacy-web-arm:${{ steps.short-sha.outputs.sha }}
-            context: ./64bits/Dockerfile
+            file: ./64bits/Dockerfile
             platforms: linux/arm64
       - name: Build and push with latest tag
         uses: docker/build-push-action@v4

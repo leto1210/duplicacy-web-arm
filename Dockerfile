@@ -1,5 +1,7 @@
 
-FROM arm32v7/alpine:3.19.0
+FROM arm64v8/alpine:3.19.0 AS 64bits
+FROM arm32v7/alpine:3.19.0 AS 32bits
+
 
 LABEL maintainer="leto1210"
 LABEL org.label-schema.vcs-url="e.g. https://github.com/leto1210/duplicacy-web-arm"
@@ -21,12 +23,32 @@ ENV TZ="Europe/Paris"
 RUN apk update
 RUN apk add --no-cache bash ca-certificates dbus su-exec tzdata
 
+FROM 32bits
 RUN wget -nv -O /usr/local/bin/duplicacy_web https://acrosync.com/duplicacy-web/duplicacy_web_linux_arm_${DUPLICACY_WEB_VERSION} 2>&1 && \
     chmod +x /usr/local/bin/duplicacy_web && \
     rm -f /var/lib/dbus/machine-id && ln -s /config/machine-id /var/lib/dbus/machine-id && \
     wget -nv -O /usr/local/bin/duplicacy https://github.com/gilbertchen/duplicacy/releases/download/v${DUPLICACY_VERSION}/duplicacy_linux_arm_${DUPLICACY_VERSION} 2>&1 && \
     chmod +x /usr/local/bin/duplicacy
 
+# Reduce  container size
+
+RUN rm -rf /var/lib/apk/* && \
+    rm -rf /tmp/*
+
+EXPOSE 3875/tcp
+VOLUME /config /logs /cache
+
+COPY ./init.sh ./launch.sh /usr/local/bin/
+
+ENTRYPOINT /usr/local/bin/init.sh
+
+
+FROM 64bits
+RUN wget -nv -O /usr/local/bin/duplicacy_web https://acrosync.com/duplicacy-web/duplicacy_web_linux_arm64_${DUPLICACY_WEB_VERSION} 2>&1 && \
+    chmod +x /usr/local/bin/duplicacy_web && \
+    rm -f /var/lib/dbus/machine-id && ln -s /config/machine-id /var/lib/dbus/machine-id && \
+    wget -nv -O /usr/local/bin/duplicacy https://github.com/gilbertchen/duplicacy/releases/download/v${DUPLICACY_VERSION}/duplicacy_linux_arm64_${DUPLICACY_VERSION} 2>&1 && \
+    chmod +x /usr/local/bin/duplicacy
 # Reduce  container size
 
 RUN rm -rf /var/lib/apk/* && \

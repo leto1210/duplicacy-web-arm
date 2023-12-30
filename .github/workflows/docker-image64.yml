@@ -1,17 +1,17 @@
-name: Docker Image CI 32 bits
+name: Docker Image CI 64 bits only
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "arm64" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "arm64" ]
 
 jobs:
 
   build:
     runs-on: self-hosted
     env:
-      DOCKER_TARGET_PLATFORM: linux/arm/v7
+      DOCKER_TARGET_PLATFORM: linux/arm/v8
 
     steps:
       - name: Checkout code
@@ -26,8 +26,6 @@ jobs:
       # - run: echo $SHA
       #   env:
       #     SHA: ${{ env.SHA }}
-      # - name: Build the Docker image 32bits
-      #   run: docker build . --file Dockerfile --tag my-image-name:${{ steps.short-sha.outputs.sha }}
       # - name: Build the Docker image 64bits
       #   run: docker build . --file ./64bits/Dockerfile --tag my-image-name:${{ steps.short-sha.outputs.sha }}
       - name: Login to Docker Hub
@@ -35,23 +33,15 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Build and push with commit number 64bits
+      - name: Build and push with commit number
         uses: docker/build-push-action@v4
         with:
             push: true
             tags: leto1210/duplicacy-web-arm:${{ steps.short-sha.outputs.sha }}, leto1210/duplicacy-web-arm:arm64
             file: ./64bits/Dockerfile
             platforms: linux/arm64
-      - name: Build and push with commit number 32bits
-        uses: docker/build-push-action@v4
-        with:
-            push: true
-            tags: leto1210/duplicacy-web-arm:${{ steps.short-sha.outputs.sha }}, leto1210/duplicacy-web-arm:armv7
-            platforms: linux/arm32v7
-
       - name: Build and push with latest tag
         uses: docker/build-push-action@v4
         with:
-            push: true
+            push: false
             tags: leto1210/duplicacy-web-arm:latest

@@ -1,7 +1,6 @@
 # Duplicacy web container for ARM
 
 
-[![Travis Build Status](https://travis-ci.com/leto1210/duplicacy-web-arm.svg?branch=master)](https://travis-ci.com/github/leto1210/duplicacy-web-arm)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Docker Pulls](https://img.shields.io/docker/pulls/leto1210/duplicacy-web-arm)
 [![Trivy security check](https://github.com/leto1210/duplicacy-web-arm/actions/workflows/trivy.yml/badge.svg)](https://github.com/leto1210/duplicacy-web-arm/actions/workflows/trivy.yml)

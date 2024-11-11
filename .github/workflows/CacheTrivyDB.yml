@@ -14,9 +14,9 @@ jobs:
     runs-on: self-hosted
     env:
       DOCKER_TARGET_PLATFORM: linux/arm/v8
-  lint:
-    name: Cache Trivy DBs
-    runs-on: ubuntu-latest
+  # lint:
+  #   name: Cache Trivy DBs
+  #   runs-on: ubuntu-latest
 
     steps:
       - name: Install ORAS

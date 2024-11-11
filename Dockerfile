@@ -4,8 +4,8 @@ FROM arm32v7/alpine:3.20.3
 LABEL maintainer="leto1210"
 LABEL org.label-schema.vcs-url="e.g. https://github.com/leto1210/duplicacy-web-arm"
 
-ENV DUPLICACY_WEB_VERSION=1.8.2
-ENV DUPLICACY_VERSION=3.2.3
+ENV DUPLICACY_WEB_VERSION=1.8.3
+ENV DUPLICACY_VERSION=3.2.4
 
 # Set to actual USR_ID and GRP_ID of the user this should run under
 # Uses root by default, unless changed

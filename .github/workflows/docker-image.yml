@@ -48,7 +48,7 @@ jobs:
         with:
             push: true
             tags: leto1210/duplicacy-web-arm:${{ steps.short-sha.outputs.sha }}, leto1210/duplicacy-web-arm:armv7
-            platforms: linux/arm32v7
+            platforms: linux/armv7
 
       - name: Build and push with latest tag
         uses: docker/build-push-action@v5

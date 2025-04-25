@@ -23,13 +23,8 @@ ENV TZ="Europe/Paris"
 RUN apk update && \
     apk add --no-cache bash ca-certificates dbus su-exec tzdata wget
 
-
 # Vérifiez la valeur de ARCH
-RUN echo "ARCH is armv7"
-
-# Vérifiez les valeurs des versions
-RUN echo "DUPLICACY_WEB_VERSION is ${DUPLICACY_WEB_VERSION}"
-RUN echo "DUPLICACY_VERSION is ${DUPLICACY_VERSION}"
+#RUN echo "ARCH is armv7"
 
 # Télécharger les binaires appropriés pour armv7
 RUN echo "Downloading for armv7"; \

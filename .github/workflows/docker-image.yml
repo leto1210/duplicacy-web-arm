@@ -1,4 +1,21 @@
-- uses: benjlevesque/short-sha@v2.2
+name: Docker Image CI 32 bits and 64 bits
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Generate short SHA
+        uses: benjlevesque/short-sha@v2.2
         id: short-sha
         with:
           length: 6
@@ -26,21 +43,21 @@
       - name: Build and push 64-bit image
         uses: docker/build-push-action@v5
         with:
-            push: true
-            tags: |
-              leto1210/duplicacy-web-arm:${{ steps.short-sha.outputs.sha }}-arm64
-              leto1210/duplicacy-web-arm:latest-arm64
-            build-args: ARCH=arm64
-            file: ./Dockerfile
-            platforms: linux/arm64
+          push: true
+          tags: |
+            leto1210/duplicacy-web-arm:${{ steps.short-sha.outputs.sha }}-arm64
+            leto1210/duplicacy-web-arm:latest-arm64
+          build-args: ARCH=arm64
+          file: ./Dockerfile
+          platforms: linux/arm64
 
       - name: Build and push 32-bit image
         uses: docker/build-push-action@v5
         with:
-            push: true
-            tags: |
-              leto1210/duplicacy-web-arm:${{ steps.short-sha.outputs.sha }}-armv7
-              leto1210/duplicacy-web-arm:latest-armv7
-            build-args: ARCH=armv7
-            file: ./Dockerfile
-            platforms: linux/arm/v7
+          push: true
+          tags: |
+            leto1210/duplicacy-web-arm:${{ steps.short-sha.outputs.sha }}-armv7
+            leto1210/duplicacy-web-arm:latest-armv7
+          build-args: ARCH=armv7
+          file: ./Dockerfile
+          platforms: linux/arm/v7

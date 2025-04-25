@@ -55,7 +55,7 @@ jobs:
           cache: true
           exit-code: 0
           ignore-unfixed: true
-          image-ref: docker.io/leto1210/duplicacy-web-arm:${{ env.sha }}
+          image-ref: docker.io/leto1210/duplicacy-web-arm:${{ env.sha }}-arm64
           format: 'sarif'
           output: 'duplicacy-web-arm_trivy-results.sarif'
           severity: 'CRITICAL,HIGH'

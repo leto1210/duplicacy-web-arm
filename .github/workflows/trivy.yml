@@ -17,6 +17,8 @@ jobs:
     #runs-on: ubuntu-latest
     runs-on: self-hosted
 
+    if: ${{ github.event.workflow_run.conclusion == 'success' }} # Exécute uniquement si le workflow précédent a réussi
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3

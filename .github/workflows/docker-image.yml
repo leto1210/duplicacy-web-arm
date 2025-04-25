@@ -44,17 +44,6 @@ jobs:
         with:
           platforms: all
 
-      - name: Build and push 64-bit image
-        uses: docker/build-push-action@v5
-        with:
-          push: true
-          tags: |
-            leto1210/duplicacy-web-arm:${{ steps.short-sha.outputs.sha }}-arm64
-            leto1210/duplicacy-web-arm:latest-arm64
-          build-args: ARCH=arm64
-          file: ./Manifest/Dockerfile
-          platforms: linux/arm64
-
       - name: Build and push 32-bit image
         uses: docker/build-push-action@v5
         with:
@@ -65,3 +54,14 @@ jobs:
           build-args: ARCH=armv7
           file: ./Manifest/Dockerfile
           platforms: linux/arm/v7
+
+        - name: Build and push 64-bit image
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: |
+            leto1210/duplicacy-web-arm:${{ steps.short-sha.outputs.sha }}-arm64
+            leto1210/duplicacy-web-arm:latest-arm64
+          build-args: ARCH=arm64
+          file: ./Manifest/Dockerfile
+          platforms: linux/arm64

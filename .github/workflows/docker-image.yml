@@ -42,16 +42,6 @@ jobs:
         with:
           install: true
 
-      - name: Debug environment variables
-        run: |
-          echo "Environment variables:"
-          env
-
-      - name: Debug Dockerfile
-        run: |
-          echo "Dockerfile content:"
-          cat ./Dockerfile
-
       - name: Build and push 32-bit image
         uses: docker/build-push-action@v5
         with:
@@ -60,13 +50,8 @@ jobs:
             leto1210/duplicacy-web-arm:${{ env.SHA }}-armv7
             leto1210/duplicacy-web-arm:latest-armv7
           build-args: ARCH=armv7
-          file: ./Dockerfile
+          file: ./Dockerfile32
           platforms: linux/arm/v7
-
-      - name: Debug 32-bit image build
-        run: |
-          echo "Inspecting 32-bit image:"
-          docker image inspect leto1210/duplicacy-web-arm:${{ env.SHA }}-armv7 || echo "Image not found"
 
       - name: Build and push 64-bit image
         uses: docker/build-push-action@v5
@@ -76,10 +61,5 @@ jobs:
             leto1210/duplicacy-web-arm:${{ env.SHA }}-arm64
             leto1210/duplicacy-web-arm:latest-arm64
           build-args: ARCH=arm64
-          file: ./Dockerfile
+          file: ./Dockerfile64
           platforms: linux/arm64
-
-      - name: Debug 64-bit image build
-        run: |
-          echo "Inspecting 64-bit image:"
-          docker image inspect leto1210/duplicacy-web-arm:${{ env.SHA }}-arm64 || echo "Image not found"

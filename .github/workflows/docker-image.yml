@@ -39,10 +39,10 @@ jobs:
         with:
           install: true
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-        with:
-          platforms: all
+      # - name: Set up QEMU
+      #   uses: docker/setup-qemu-action@v2
+      #   with:
+      #     platforms: all
 
       - name: Build and push 32-bit image
         uses: docker/build-push-action@v5

@@ -1,6 +1,6 @@
 name: Do things every 5 days
 on:
-  schedule:
+  schedules:
     - cron: "* * */5 * *"
 
     jobs:

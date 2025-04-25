@@ -1,6 +1,6 @@
 # Définir l'architecture cible (par défaut arm64)
 # Vous pouvez passer `--build-arg ARCH=armv7` pour construire une image 32 bits
-#ARG ARCH=arm64
+ARG ARCH=arm64
 
 # Choisir l'image Alpine en fonction de l'architecture
 FROM alpine:3.18 AS base-arm64

@@ -1,6 +1,8 @@
 name: Cache Trivy DBs
 
-on: push
+on:
+  schedule:
+    - cron: "0 5 * * *" # Exécution quotidienne à 5h00 UTC
 
 permissions:
   packages: write

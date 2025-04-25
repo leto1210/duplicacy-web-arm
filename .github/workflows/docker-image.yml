@@ -52,7 +52,7 @@ jobs:
             leto1210/duplicacy-web-arm:${{ steps.short-sha.outputs.sha }}-arm64
             leto1210/duplicacy-web-arm:latest-arm64
           build-args: ARCH=arm64
-          file: ./Dockerfile
+          file: ./Manifest/Dockerfile
           platforms: linux/arm64
 
       - name: Build and push 32-bit image
@@ -63,5 +63,5 @@ jobs:
             leto1210/duplicacy-web-arm:${{ steps.short-sha.outputs.sha }}-armv7
             leto1210/duplicacy-web-arm:latest-armv7
           build-args: ARCH=armv7
-          file: ./Dockerfile
+          file: ./Manifest/Dockerfile
           platforms: linux/arm/v7

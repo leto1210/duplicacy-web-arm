@@ -1,10 +1,10 @@
 name: Do things every 5 days
+
 on:
-  schedules:
-    - cron: "* * */5 * *"
+  schedule:
+    - cron: "0 0 */5 * *" # Exécution tous les 5 jours à minuit
 
-    jobs:
-
+jobs:
   build:
     runs-on: self-hosted
     env:
@@ -13,11 +13,13 @@ on:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      - uses: benjlevesque/short-sha@v1.2
+      - name: Generate short SHA
+        uses: benjlevesque/short-sha@v1.2
         id: short-sha
         with:
           length: 6
-      - run: echo $SHA
+      - name: Print short SHA
+        run: echo $SHA
         env:
           SHA: ${{ steps.short-sha.outputs.sha }}
       - name: Login to Docker Hub
@@ -28,7 +30,10 @@ on:
       - name: Build and push with commit number
         uses: docker/build-push-action@v5
         with:
-            push: false
-            tags: leto1210/duplicacy-web-arm:${{ steps.short-sha.outputs.sha }}, leto1210/duplicacy-web-arm:arm64
+            push: true
+            tags: |
+              leto1210/duplicacy-web-arm:${{ steps.short-sha.outputs.sha }}
+              leto1210/duplicacy-web-arm:arm64
             file: ./64bits/Dockerfile
+            platforms: linux/arm64ile
             platforms: linux/arm64

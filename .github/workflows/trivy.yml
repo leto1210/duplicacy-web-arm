@@ -14,12 +14,13 @@ permissions:
 
 jobs:
   scan:
-    runs-on: ubuntu-latest
+    #runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
-      - name: Configure QEMU
-        run: |
-          docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+      #- name: Configure QEMU
+      #  run: |
+      #    docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 
       - name: Checkout code
         uses: actions/checkout@v3
@@ -46,6 +47,10 @@ jobs:
         run: |
           oras pull ghcr.io/leto1210/duplicacy-web-arm/trivy-db:2
           oras pull ghcr.io/leto1210/duplicacy-web-arm/trivy-java-db:1
+      - name: Debug Docker Image
+        run: |
+          docker pull docker.io/leto1210/duplicacy-web-arm:latest-arm64
+          docker inspect docker.io/leto1210/duplicacy-web-arm:latest-arm64
 
       - name: Scan Container Image
         id: scan
@@ -61,7 +66,6 @@ jobs:
           ignore-unfixed: true
           #image-ref: docker.io/leto1210/duplicacy-web-arm:${{ env.sha }}-arm64
           image-ref: docker.io/leto1210/duplicacy-web-arm:latest-arm64
-          platform: linux/arm64
           format: 'sarif'
           output: 'duplicacy-web-arm_trivy-results.sarif'
           severity: 'CRITICAL,HIGH'

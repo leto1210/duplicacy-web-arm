@@ -18,20 +18,16 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      #- name: Configure QEMU
-      #  run: |
-      #    docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set short SHA
-        id: short-sha
-        run: echo "sha=$(echo ${{ github.sha }} | cut -c1-6)" >> $GITHUB_ENV
+      # - name: Set short SHA
+      #   id: short-sha
+      #   run: echo "sha=$(echo ${{ github.sha }} | cut -c1-6)" >> $GITHUB_ENV
 
-      - name: Install ORAS
-        id: oras
-        uses: oras-project/setup-oras@v1.2.1
+      #- name: Install ORAS
+      #  id: oras
+      #  uses: oras-project/setup-oras@v1.2.1
 
       - name: Authenticate to GHCR
         id: ghcr
@@ -41,16 +37,16 @@ jobs:
             -u ${{ github.actor }} \
             -p ${{ github.token }}
 
-      - name: Pull Trivy DBs from GHCR
-        id: pull
-        shell: bash
-        run: |
-          oras pull ghcr.io/leto1210/duplicacy-web-arm/trivy-db:2
-          oras pull ghcr.io/leto1210/duplicacy-web-arm/trivy-java-db:1
-      - name: Debug Docker Image
-        run: |
-          docker pull docker.io/leto1210/duplicacy-web-arm:latest-arm64
-          docker inspect docker.io/leto1210/duplicacy-web-arm:latest-arm64
+      # - name: Pull Trivy DBs from GHCR
+      #   id: pull
+      #   shell: bash
+      #   run: |
+      #     oras pull ghcr.io/leto1210/duplicacy-web-arm/trivy-db:2
+      #     oras pull ghcr.io/leto1210/duplicacy-web-arm/trivy-java-db:1
+      # - name: Debug Docker Image
+      #   run: |
+      #     docker pull docker.io/leto1210/duplicacy-web-arm:latest-arm64
+      #     docker inspect docker.io/leto1210/duplicacy-web-arm:latest-arm64
 
       - name: Scan Container Image
         id: scan

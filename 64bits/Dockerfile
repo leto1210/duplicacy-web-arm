@@ -1,6 +1,17 @@
+# Définir l'architecture cible (par défaut arm64)
+# Vous pouvez passer `--build-arg ARCH=armv7` pour construire une image 32 bits
+#ARG ARCH=arm64
+
+# Choisir l'image Alpine en fonction de l'architecture
+FROM alpine:3.18 AS base-arm64
+FROM alpine:3.18 AS base-armv7
+
+# Utiliser l'image appropriée en fonction de $ARCH
+FROM base-${ARCH} AS final
+
 # Définit les versions des logiciels
-ENV DUPLICACY_WEB_VERSION=1.8.3
-ENV DUPLICACY_VERSION=3.2.4
+ENV DUPLICACY_WEB_VERSION=1.8.3 \
+    DUPLICACY_VERSION=3.2.4
 
 # Set to actual USR_ID and GRP_ID of the user this should run under
 # Uses root by default, unless changed
@@ -8,10 +19,6 @@ ENV USR_ID=0 \
     GRP_ID=0
 
 ENV TZ="Europe/Paris"
-
-# Définir l'architecture cible (par défaut arm64)
-# Vous pouvez passer `--build-arg ARCH=armv7` pour construire une image 32 bits
-ARG ARCH=arm64
 
 # Installer les logiciels nécessaires
 RUN apk update && \
@@ -32,7 +39,8 @@ RUN if [ "$ARCH" = "arm64" ]; then \
 
 # Réduire la taille de l'image
 RUN rm -rf /var/lib/apk/* && \
-    rm -rf /tmp/*
+    rm -rf /tmp/* \
+    rm -rf /var/cache/apk/*
 
 # Exposer le port et définir les volumes
 EXPOSE 3875/tcp

@@ -1,14 +1,11 @@
 ---
 name: Trivy scan V2
 on:
-  push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
-  schedule:
-    - cron: 16 3 * * 4
+  workflow_run:
+    workflows:
+      - Docker Image CI 32 bits and 64 bits
+    types:
+      - completed
 permissions:
   contents: read
   packages: write

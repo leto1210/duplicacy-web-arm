@@ -25,14 +25,14 @@ RUN apk update && \
     apk add --no-cache bash ca-certificates dbus su-exec tzdata wget
 
 # Télécharger les binaires appropriés en fonction de l'architecture
-RUN if [ "$ARCH" = "armv7" ]; then \
+RUN if [ "${ARCH}" = "armv7" ]; then \
         wget -nv -O /usr/local/bin/duplicacy_web https://acrosync.com/duplicacy-web/duplicacy_web_linux_arm_${DUPLICACY_WEB_VERSION} 2>&1 && \
         wget -nv -O /usr/local/bin/duplicacy https://github.com/gilbertchen/duplicacy/releases/download/v${DUPLICACY_VERSION}/duplicacy_linux_arm_${DUPLICACY_VERSION} 2>&1; \
-    elif [ "$ARCH" = "arm64" ]; then \
+    elif [ "{$ARCH}" = "arm64" ]; then \
         wget -nv -O /usr/local/bin/duplicacy_web https://acrosync.com/duplicacy-web/duplicacy_web_linux_arm64_${DUPLICACY_WEB_VERSION} 2>&1 && \
         wget -nv -O /usr/local/bin/duplicacy https://github.com/gilbertchen/duplicacy/releases/download/v${DUPLICACY_VERSION}/duplicacy_linux_arm64_${DUPLICACY_VERSION} 2>&1; \
     else \
-        echo "Unsupported architecture: $ARCH" && exit 1; \
+        echo "Unsupported architecture: ${ARCH}" && exit 1; \
     fi && \
     chmod +x /usr/local/bin/duplicacy_web /usr/local/bin/duplicacy && \
     rm -f /var/lib/dbus/machine-id && ln -s /config/machine-id /var/lib/dbus/machine-id

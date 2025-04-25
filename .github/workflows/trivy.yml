@@ -17,6 +17,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Configure QEMU
+        run: |
+          docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
       - name: Checkout code
         uses: actions/checkout@v3
 
@@ -45,7 +49,7 @@ jobs:
 
       - name: Scan Container Image
         id: scan
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@latest
         env:
           TRIVY_DB_REPOSITORY: ghcr.io/leto1210/duplicacy-web-arm/trivy-db,public.ecr.aws/aquasecurity/trivy-db,ghcr.io/aquasecurity/trivy-db
           TRIVY_JAVA_DB_REPOSITORY: ghcr.io/leto1210/duplicacy-web-arm/trivy-java-db,public.ecr.aws/aquasecurity/trivy-java-db,ghcr.io/aquasecurity/trivy-java-db

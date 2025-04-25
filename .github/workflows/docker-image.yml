@@ -24,7 +24,10 @@ jobs:
         with:
           length: 6
 
-      - run: echo $SHA
+      - run: echo "SHA=${{ steps.short-sha.outputs.sha }}" >> $GITHUB_ENV
+
+      - name: Print short SHA
+        run: echo "Short SHA: $SHA"
         env:
           SHA: ${{ steps.short-sha.outputs.sha }}
 
@@ -39,29 +42,29 @@ jobs:
         with:
           install: true
 
-      # - name: Set up QEMU
-      #   uses: docker/setup-qemu-action@v2
-      #   with:
-      #     platforms: all
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+        with:
+          platforms: all
 
       - name: Build and push 32-bit image
         uses: docker/build-push-action@v5
         with:
           push: true
           tags: |
-            leto1210/duplicacy-web-arm:${{ steps.short-sha.outputs.sha }}-armv7
+            leto1210/duplicacy-web-arm:${{ env.SHA }}-armv7
             leto1210/duplicacy-web-arm:latest-armv7
           build-args: ARCH=armv7
-          file: ./Manifest/Dockerfile
+          file: ./Dockerfile
           platforms: linux/arm/v7
 
-        - name: Build and push 64-bit image
-          uses: docker/build-push-action@v5
+      - name: Build and push 64-bit image
+        uses: docker/build-push-action@v5
         with:
           push: true
           tags: |
-            leto1210/duplicacy-web-arm:${{ steps.short-sha.outputs.sha }}-arm64
+            leto1210/duplicacy-web-arm:${{ env.SHA }}-arm64
             leto1210/duplicacy-web-arm:latest-arm64
           build-args: ARCH=arm64
-          file: ./Manifest/Dockerfile
+          file: ./Dockerfile
           platforms: linux/arm64

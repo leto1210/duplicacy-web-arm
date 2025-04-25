@@ -2,9 +2,13 @@ name: Docker Image CI 32 bits and 64 bits
 
 on:
   push:
-    branches: [ "master" ]
+    branches:
+      - "master"
+    paths-ignore:
+      - ".github/**" # Ignore les changements dans le répertoire .github
   pull_request:
-    branches: [ "master" ]
+    branches:
+      - "master"
 
 jobs:
   build:

@@ -6,6 +6,8 @@ FROM arm32v7/alpine:3.21 AS base-armv7
 
 # Utiliser l'image appropriée en fonction de $ARCH pour 32 bits
 FROM base-armv7 AS builder-armv7
+LABEL maintainer="leto1210"
+LABEL org.label-schema.vcs-url="e.g. https://github.com/leto1210/duplicacy-web-arm"
 
 # Définit les versions des logiciels
 ENV DUPLICACY_WEB_VERSION=1.8.3 \

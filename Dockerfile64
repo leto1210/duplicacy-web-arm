@@ -6,6 +6,8 @@ FROM arm64v8/alpine:3.21 AS base-arm64
 
 # Utiliser l'image appropriée en fonction de $ARCH pour 64 bits
 FROM base-arm64 AS builder-arm64
+LABEL maintainer="leto1210"
+LABEL org.label-schema.vcs-url="e.g. https://github.com/leto1210/duplicacy-web-arm"
 
 # Définit les versions des logiciels
 ENV DUPLICACY_WEB_VERSION=1.8.3 \

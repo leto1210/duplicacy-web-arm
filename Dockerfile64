@@ -2,7 +2,7 @@
 ARG ARCH=armv8
 
 # Choisir l'image Alpine en fonction de l'architecture
-FROM arm64v8/alpine:3.21 AS base-arm64
+FROM arm64v8/alpine:3.22 AS base-arm64
 
 # Utiliser l'image appropriée en fonction de $ARCH pour 64 bits
 FROM base-arm64 AS builder-arm64

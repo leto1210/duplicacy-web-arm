@@ -11,7 +11,7 @@ LABEL org.label-schema.vcs-url="e.g. https://github.com/leto1210/duplicacy-web-a
 
 # Définit les versions des logiciels
 ENV DUPLICACY_WEB_VERSION=1.8.3 \
-    DUPLICACY_VERSION=3.2.4
+    DUPLICACY_VERSION=3.2.5
 
 # Set to actual USR_ID and GRP_ID of the user this should run under
 # Uses root by default, unless changed

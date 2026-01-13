@@ -2,19 +2,13 @@ name: Cache Trivy DBs
 
 on:
   schedule:
-    - cron: '0 0 * * *'
-  workflow_dispatch:
+    - cron: "0 5 * * *" # Exécution quotidienne à 5h00 UTC
 
 permissions:
   packages: write
   id-token: write
 
 jobs:
-  build:
-    runs-on: self-hosted
-    env:
-      DOCKER_TARGET_PLATFORM: linux/arm/v8
-
   lint:
     name: Cache Trivy DBs
     runs-on: ubuntu-latest

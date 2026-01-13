@@ -1,58 +1,55 @@
----
-name: Trivy scan V2
+name: Trivy Scan
+
 on:
-  push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
-  schedule:
-    - cron: 16 3 * * 4
+  workflow_dispatch: # Permet de déclencher manuellement le workflow
+  workflow_run:
+    workflows:
+      - Docker Image CI 32 bits and 64 bits
+    types:
+      - completed
+
 permissions:
   contents: read
-  packages: write
+  security-events: write
+
 jobs:
-  build:
-    permissions:
-      contents: read
-      security-events: write
-      packages: write
-    name: Build
-    runs-on: ubuntu-20.04
+  scan:
+    #runs-on: ubuntu-latest
+    runs-on: self-hosted
+
+    if: ${{ github.event.workflow_run.conclusion == 'success' }} # Exécute uniquement si le workflow précédent a réussi
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      - uses: benjlevesque/short-sha@v2.2
-        id: short-sha
-        with:
-          length: 6
-      - run: echo $SHA
-        env:
-          SHA: ${{ steps.short-sha.outputs.sha }}
-      - run: echo $SHA
-        env:
-          SHA: ${{ env.SHA }}
-      - name: Install ORAS
-        id: oras
-        uses: oras-project/setup-oras@v1.2.1
-      - name: Authenticate to GHCR
-        id: ghcr
-        shell: bash
-        run: |
-          oras login ghcr.io \
-            -u ${{ github.actor }} \
-            -p ${{ github.token }}
-      - name: Pull Trivy DBs from GHCR
-        id: pull
-        shell: bash
-        run: |
-          oras pull ghcr.io/leto1210/duplicacy-web-arm/trivy-db:2
-          oras pull ghcr.io/leto1210/duplicacy-web-arm/trivy-java-db:1
-      - name: Sleep Action
-        uses: jakejarvis/wait-action@v0.1.1
-        with:
-         time: 1m
+
+      # - name: Set short SHA
+      #   id: short-sha
+      #   run: echo "sha=$(echo ${{ github.sha }} | cut -c1-6)" >> $GITHUB_ENV
+
+      #- name: Install ORAS
+      #  id: oras
+      #  uses: oras-project/setup-oras@v1.2.1
+
+      # - name: Authenticate to GHCR
+      #   id: ghcr
+      #   shell: bash
+      #   run: |
+      #     oras login ghcr.io \
+      #       -u ${{ github.actor }} \
+      #       -p ${{ github.token }}
+
+      # - name: Pull Trivy DBs from GHCR
+      #   id: pull
+      #   shell: bash
+      #   run: |
+      #     oras pull ghcr.io/leto1210/duplicacy-web-arm/trivy-db:2
+      #     oras pull ghcr.io/leto1210/duplicacy-web-arm/trivy-java-db:1
+      # - name: Debug Docker Image
+      #   run: |
+      #     docker pull docker.io/leto1210/duplicacy-web-arm:latest-arm64
+      #     docker inspect docker.io/leto1210/duplicacy-web-arm:latest-arm64
+
       - name: Scan Container Image
         id: scan
         uses: aquasecurity/trivy-action@0.28.0
@@ -65,10 +62,12 @@ jobs:
           cache: true
           exit-code: 0
           ignore-unfixed: true
-          image-ref: docker.io/leto1210/duplicacy-web-arm:${{ env.sha }}
+          #image-ref: docker.io/leto1210/duplicacy-web-arm:${{ env.sha }}-arm64
+          image-ref: docker.io/leto1210/duplicacy-web-arm:latest-arm64
           format: 'sarif'
           output: 'duplicacy-web-arm_trivy-results.sarif'
           severity: 'CRITICAL,HIGH'
+
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
         if: always()

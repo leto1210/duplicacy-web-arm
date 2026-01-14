@@ -21,7 +21,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # - name: Set short SHA
       #   id: short-sha
@@ -52,7 +52,7 @@ jobs:
 
       - name: Scan Container Image
         id: scan
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@master
         env:
           TRIVY_DB_REPOSITORY: ghcr.io/leto1210/duplicacy-web-arm/trivy-db,public.ecr.aws/aquasecurity/trivy-db,ghcr.io/aquasecurity/trivy-db
           TRIVY_JAVA_DB_REPOSITORY: ghcr.io/leto1210/duplicacy-web-arm/trivy-java-db,public.ecr.aws/aquasecurity/trivy-java-db,ghcr.io/aquasecurity/trivy-java-db

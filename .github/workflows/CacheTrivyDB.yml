@@ -16,7 +16,7 @@ jobs:
     steps:
       - name: Install ORAS
         id: oras
-        uses: oras-project/setup-oras@v1
+        uses: oras-project/setup-oras@v1.2.1
 
       - name: Authenticate to GHCR
         id: ghcr

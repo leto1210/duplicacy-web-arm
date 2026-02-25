@@ -26,24 +26,23 @@ RUN apk update && \
     apk add --no-cache bash ca-certificates dbus su-exec tzdata wget
 
 # Déterminer les bonnes URLs en fonction de l'architecture
-ARG ARCH=armv7
-RUN if [ "$ARCH" = "armv7" ]; then \
-      DUPLICACY_WEB_ARCH="arm" && \
-      DUPLICACY_ARCH="arm"; \
-    elif [ "$ARCH" = "arm64" ]; then \
-      DUPLICACY_WEB_ARCH="arm64" && \
-      DUPLICACY_ARCH="arm64"; \
-    else \
-      echo "Unsupported architecture: $ARCH" && exit 1; \
-    fi && \
-    echo "Downloading for $ARCH" && \
-    wget -nv -O /usr/local/bin/duplicacy_web https://acrosync.com/duplicacy-web/duplicacy_web_linux_${DUPLICACY_WEB_ARCH}_${DUPLICACY_WEB_VERSION} 2>&1 && \
-    if [ $? -ne 0 ]; then echo "Failed to download duplicacy_web for $ARCH" && exit 1; fi && \
-    wget -nv -O /usr/local/bin/duplicacy https://github.com/gilbertchen/duplicacy/releases/download/v${DUPLICACY_VERSION}/duplicacy_linux_${DUPLICACY_ARCH}_${DUPLICACY_VERSION} 2>&1 && \
-    if [ $? -ne 0 ]; then echo "Failed to download duplicacy for $ARCH" && exit 1; fi
-
-RUN chmod +x /usr/local/bin/duplicacy_web /usr/local/bin/duplicacy && \
-    rm -f /var/lib/dbus/machine-id && ln -s /config/machine-id /var/lib/dbus/machine-id
+ARG ARCH
+RUN set -e; \
+    case "$ARCH" in \
+      armv7) DUPLICACY_WEB_ARCH="arm"; DUPLICACY_ARCH="arm" ;; \
+      arm64) DUPLICACY_WEB_ARCH="arm64"; DUPLICACY_ARCH="arm64" ;; \
+      *) echo "Architecture non prise en charge : $ARCH" >&2; exit 1 ;; \
+    esac; \
+    echo "Téléchargement pour $ARCH"; \
+    if ! wget -nv -O /usr/local/bin/duplicacy_web "https://acrosync.com/duplicacy-web/duplicacy_web_linux_${DUPLICACY_WEB_ARCH}_${DUPLICACY_WEB_VERSION}"; then \
+      echo "Échec du téléchargement de duplicacy_web pour $ARCH" >&2; exit 1; \
+    fi; \
+    if ! wget -nv -O /usr/local/bin/duplicacy "https://github.com/gilbertchen/duplicacy/releases/download/v${DUPLICACY_VERSION}/duplicacy_linux_${DUPLICACY_ARCH}_${DUPLICACY_VERSION}"; then \
+      echo "Échec du téléchargement de duplicacy pour $ARCH" >&2; exit 1; \
+    fi; \
+    chmod +x /usr/local/bin/duplicacy_web /usr/local/bin/duplicacy; \
+    rm -f /var/lib/dbus/machine-id; \
+    ln -s /config/machine-id /var/lib/dbus/machine-id
 
 # Réduire la taille de l'image
 RUN rm -rf /var/lib/apk/* && \

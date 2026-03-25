@@ -14,62 +14,33 @@ permissions:
 
 jobs:
   scan:
-    #runs-on: ubuntu-latest
     runs-on: self-hosted
 
-    if: ${{ github.event.workflow_run.conclusion == 'success' }} # Exécute uniquement si le workflow précédent a réussi
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
-
-      # - name: Set short SHA
-      #   id: short-sha
-      #   run: echo "sha=$(echo ${{ github.sha }} | cut -c1-6)" >> $GITHUB_ENV
-
-      #- name: Install ORAS
-      #  id: oras
-      #  uses: oras-project/setup-oras@v1.2.1
-
-      # - name: Authenticate to GHCR
-      #   id: ghcr
-      #   shell: bash
-      #   run: |
-      #     oras login ghcr.io \
-      #       -u ${{ github.actor }} \
-      #       -p ${{ github.token }}
-
-      # - name: Pull Trivy DBs from GHCR
-      #   id: pull
-      #   shell: bash
-      #   run: |
-      #     oras pull ghcr.io/leto1210/duplicacy-web-arm/trivy-db:2
-      #     oras pull ghcr.io/leto1210/duplicacy-web-arm/trivy-java-db:1
-      # - name: Debug Docker Image
-      #   run: |
-      #     docker pull docker.io/leto1210/duplicacy-web-arm:latest-arm64
-      #     docker inspect docker.io/leto1210/duplicacy-web-arm:latest-arm64
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Scan Container Image
         id: scan
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # 0.35.0
         env:
-          TRIVY_DB_REPOSITORY: ghcr.io/leto1210/duplicacy-web-arm/trivy-db,public.ecr.aws/aquasecurity/trivy-db,ghcr.io/aquasecurity/trivy-db
-          TRIVY_JAVA_DB_REPOSITORY: ghcr.io/leto1210/duplicacy-web-arm/trivy-java-db,public.ecr.aws/aquasecurity/trivy-java-db,ghcr.io/aquasecurity/trivy-java-db
+          TRIVY_DB_REPOSITORY: ghcr.io/leto1210/duplicacy-web-arm/trivy-db
+          TRIVY_JAVA_DB_REPOSITORY: ghcr.io/leto1210/duplicacy-web-arm/trivy-java-db
           TRIVY_USERNAME: ${{ github.actor }}
           TRIVY_PASSWORD: ${{ github.token }}
         with:
           cache: true
           exit-code: 0
           ignore-unfixed: true
-          #image-ref: docker.io/leto1210/duplicacy-web-arm:${{ env.sha }}-arm64
           image-ref: docker.io/leto1210/duplicacy-web-arm:latest-arm64
           format: 'sarif'
           output: 'duplicacy-web-arm_trivy-results.sarif'
           severity: 'CRITICAL,HIGH'
 
       - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@c03c7286b23a2c4c2a10abb7eed1512b7580b4c5 # v3.34.1
         if: always()
         with:
           sarif_file: 'duplicacy-web-arm_trivy-results.sarif'

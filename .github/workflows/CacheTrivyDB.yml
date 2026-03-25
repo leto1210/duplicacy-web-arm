@@ -5,8 +5,8 @@ on:
     - cron: "0 5 * * *" # Exécution quotidienne à 5h00 UTC
 
 permissions:
+  contents: read
   packages: write
-  id-token: write
 
 jobs:
   lint:
@@ -16,7 +16,9 @@ jobs:
     steps:
       - name: Install ORAS
         id: oras
-        uses: oras-project/setup-oras@v1.2.1
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes oras
 
       - name: Authenticate to GHCR
         id: ghcr

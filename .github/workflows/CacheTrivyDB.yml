@@ -3,22 +3,24 @@ name: Cache Trivy DBs
 on:
   schedule:
     - cron: "0 5 * * *" # Exécution quotidienne à 5h00 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: cache-trivy-db
+  cancel-in-progress: false
 
 permissions:
   contents: read
   packages: write
 
 jobs:
-  lint:
+  cache-trivy-db:
     name: Cache Trivy DBs
     runs-on: ubuntu-latest
 
     steps:
       - name: Install ORAS
-        id: oras
-        run: |
-          sudo apt-get update
-          sudo apt-get install --yes oras
+        uses: oras-project/setup-oras@v1
 
       - name: Authenticate to GHCR
         id: ghcr
@@ -35,6 +37,7 @@ jobs:
 
       - name: Push Trivy Images
         id: push
+        if: success()
         run: |
           oras push ghcr.io/leto1210/duplicacy-web-arm/trivy-db:2 \
             db.tar.gz:application/vnd.aquasec.trivy.db.layer.v1.tar+gzip \

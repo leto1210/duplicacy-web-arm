@@ -82,6 +82,8 @@ jobs:
       - name: Valider la configuration CrowdSec
         run: |
           docker run --rm \
+            --user 0:0 \
+            -v /var/run/docker.sock:/var/run/docker.sock \
             -v "$GITHUB_WORKSPACE/.github/crowdsec/acquis.yaml:/etc/crowdsec/acquis.d/duplicacy.yaml:ro" \
             crowdsecurity/crowdsec:v1.6.8 \
             crowdsec -t

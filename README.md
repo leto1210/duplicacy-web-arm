@@ -4,6 +4,7 @@
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Docker Pulls](https://img.shields.io/docker/pulls/leto1210/duplicacy-web-arm)
 [![Docker Image CI](https://github.com/leto1210/duplicacy-web-arm/actions/workflows/docker-image.yml/badge.svg)](https://github.com/leto1210/duplicacy-web-arm/actions/workflows/docker-image.yml)
+[![CrowdSec validation](https://github.com/leto1210/duplicacy-web-arm/actions/workflows/crowdsec-validation.yml/badge.svg)](https://github.com/leto1210/duplicacy-web-arm/actions/workflows/crowdsec-validation.yml)
 [![Trivy security check](https://github.com/leto1210/duplicacy-web-arm/actions/workflows/trivy.yml/badge.svg)](https://github.com/leto1210/duplicacy-web-arm/actions/workflows/trivy.yml)
 [![Dependency Review](https://github.com/leto1210/duplicacy-web-arm/actions/workflows/dependency-review.yml/badge.svg?branch=master)](https://github.com/leto1210/duplicacy-web-arm/actions/workflows/dependency-review.yml)
 
@@ -44,6 +45,13 @@ docker build -t duplicacy-web-arm:armv7 --build-arg ARCH=armv7 .
 # For 64-bit (arm64)
 docker build -t duplicacy-web-arm:arm64 --build-arg ARCH=arm64 .
 ```
+
+## Security Validation
+
+GitHub Actions includes two complementary security controls for published images:
+
+- Trivy scans the published image for known vulnerabilities.
+- CrowdSec builds the arm64 image in CI, starts it, and validates that CrowdSec can observe it through a minimal Docker acquisition configuration.
 
 ## Usage
 

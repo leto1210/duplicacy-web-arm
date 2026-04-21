@@ -1,0 +1,123 @@
+name: CrowdSec Validation
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+permissions:
+  contents: read
+
+concurrency:
+  group: crowdsec-validation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: linux/arm64
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          install: true
+
+      - name: Préparer les répertoires temporaires
+        run: |
+          mkdir -p "$RUNNER_TEMP/duplicacy-config"
+          mkdir -p "$RUNNER_TEMP/duplicacy-logs"
+          mkdir -p "$RUNNER_TEMP/duplicacy-cache"
+
+      - name: Construire l'image locale à valider
+        run: |
+          docker buildx build \
+            --platform linux/arm64 \
+            --build-arg ARCH=arm64 \
+            --tag duplicacy-web-arm:crowdsec-validation \
+            --load \
+            .
+
+      - name: Démarrer le conteneur à valider
+        run: |
+          docker network create crowdsec-validation || true
+          docker rm -f duplicacy-web-validation >/dev/null 2>&1 || true
+          docker run -d \
+            --name duplicacy-web-validation \
+            --platform linux/arm64 \
+            --network crowdsec-validation \
+            -p 3875:3875 \
+            -e TZ=Europe/Paris \
+            -e USR_ID=1000 \
+            -e GRP_ID=1000 \
+            -v "$RUNNER_TEMP/duplicacy-config:/config" \
+            -v "$RUNNER_TEMP/duplicacy-logs:/logs" \
+            -v "$RUNNER_TEMP/duplicacy-cache:/cache" \
+            duplicacy-web-arm:crowdsec-validation
+
+      - name: Attendre que l'application réponde
+        run: |
+          attempt=0
+          until curl --fail --silent http://127.0.0.1:3875/ >/dev/null; do
+            attempt=$((attempt + 1))
+            if [ "$attempt" -ge 30 ]; then
+              echo "Le conteneur Duplicacy Web ne répond pas sur le port 3875"
+              docker logs duplicacy-web-validation
+              exit 1
+            fi
+            sleep 2
+          done
+
+      - name: Démarrer CrowdSec
+        run: |
+          docker rm -f crowdsec-validation >/dev/null 2>&1 || true
+          docker run -d \
+            --name crowdsec-validation \
+            --platform linux/arm64 \
+            --network crowdsec-validation \
+            --user 0:0 \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -v "$GITHUB_WORKSPACE/.github/crowdsec/acquis.yaml:/etc/crowdsec/acquis.d/duplicacy.yaml:ro" \
+            crowdsecurity/crowdsec:latest
+
+      - name: Valider la configuration CrowdSec
+        run: docker exec crowdsec-validation crowdsec -t
+
+      - name: Attendre le démarrage de CrowdSec
+        run: |
+          attempt=0
+          until docker logs crowdsec-validation 2>&1 | grep -q "Starting processing data"; do
+            attempt=$((attempt + 1))
+            if [ "$attempt" -ge 30 ]; then
+              echo "CrowdSec n'a pas démarré correctement"
+              docker logs crowdsec-validation
+              exit 1
+            fi
+            sleep 2
+          done
+
+      - name: Générer un peu de trafic HTTP
+        run: |
+          curl --fail --silent http://127.0.0.1:3875/ >/dev/null
+          sleep 5
+
+      - name: Afficher les métriques CrowdSec
+        run: docker exec crowdsec-validation cscli metrics show acquisition || true
+
+      - name: Nettoyer les conteneurs de validation
+        if: always()
+        run: |
+          docker rm -f crowdsec-validation >/dev/null 2>&1 || true
+          docker rm -f duplicacy-web-validation >/dev/null 2>&1 || true
+          docker network rm crowdsec-validation >/dev/null 2>&1 || true

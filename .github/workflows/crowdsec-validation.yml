@@ -22,7 +22,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -79,20 +79,24 @@ jobs:
             sleep 2
           done
 
+      - name: Valider la configuration CrowdSec
+        run: |
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE/.github/crowdsec/acquis.yaml:/etc/crowdsec/acquis.d/duplicacy.yaml:ro" \
+            crowdsecurity/crowdsec:v1.6.8 \
+            crowdsec -t
+
       - name: Démarrer CrowdSec
         run: |
           docker rm -f crowdsec-validation >/dev/null 2>&1 || true
           docker run -d \
             --name crowdsec-validation \
-            --platform linux/arm64 \
             --network crowdsec-validation \
             --user 0:0 \
+            -e COLLECTIONS="crowdsecurity/linux" \
             -v /var/run/docker.sock:/var/run/docker.sock \
             -v "$GITHUB_WORKSPACE/.github/crowdsec/acquis.yaml:/etc/crowdsec/acquis.d/duplicacy.yaml:ro" \
-            crowdsecurity/crowdsec:latest
-
-      - name: Valider la configuration CrowdSec
-        run: docker exec crowdsec-validation crowdsec -t
+            crowdsecurity/crowdsec:v1.6.8
 
       - name: Attendre le démarrage de CrowdSec
         run: |
@@ -107,13 +111,21 @@ jobs:
             sleep 2
           done
 
-      - name: Générer un peu de trafic HTTP
+      - name: Générer du trafic HTTP
         run: |
-          curl --fail --silent http://127.0.0.1:3875/ >/dev/null
-          sleep 5
+          for i in $(seq 1 10); do
+            curl --silent http://127.0.0.1:3875/ >/dev/null || true
+          done
+          sleep 10
 
       - name: Afficher les métriques CrowdSec
-        run: docker exec crowdsec-validation cscli metrics show acquisition || true
+        run: docker exec crowdsec-validation cscli metrics show acquisition
+
+      - name: Vérifier que CrowdSec observe le conteneur
+        run: |
+          docker exec crowdsec-validation cscli metrics show acquisition 2>/dev/null \
+            | grep -q "duplicacy-web-validation" \
+            || { echo "CrowdSec ne voit pas le conteneur duplicacy-web-validation"; exit 1; }
 
       - name: Nettoyer les conteneurs de validation
         if: always()

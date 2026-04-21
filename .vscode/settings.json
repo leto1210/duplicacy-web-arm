@@ -1,0 +1,9 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "command": true,
+        "gh": true,
+        "env": true,
+        "true": true,
+        "docker info": true
+    }
+}

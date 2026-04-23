@@ -85,16 +85,16 @@ jobs:
           git commit -m "$PR_TITLE"
           git push --force-with-lease origin "$BRANCH_NAME"
           cat > pr-body.md <<EOF
-          Mise à jour automatique hebdomadaire de \
+          Mise à jour automatique hebdomadaire de \`DUPLICACY_WEB_VERSION\`.
 
-          - Version actuelle: \
-          - Nouvelle version: \
+          - Version actuelle: \`${CURRENT_VERSION}\`
+          - Nouvelle version: \`${LATEST_VERSION}\`
 
           Fichiers mis à jour:
-          - \
-          - \
-          - \
-          - \
+          - \`Dockerfile\`
+          - \`Dockerfile32\`
+          - \`Dockerfile64\`
+          - \`README.md\`
 
           Checklist:
           - [x] Removed unused imports and dead code
@@ -103,14 +103,6 @@ jobs:
           - [ ] Ran formatter/linter or declared they were not run
           - [x] Ensured change is a single, focused feature (one feature per commit)
           EOF
-          sed -i \
-            -e 's|Mise à jour automatique hebdomadaire de \\|Mise à jour automatique hebdomadaire de `DUPLICACY_WEB_VERSION`.|' \
-            -e "s|- Version actuelle: \\\\|- Version actuelle: \\`$CURRENT_VERSION\\`|" \
-            -e "s|- Nouvelle version: \\\\|- Nouvelle version: \\`$LATEST_VERSION\\`|" \
-            -e '0,/- \\/s//- `Dockerfile`/' \
-            -e '0,/- \\/s//- `Dockerfile32`/' \
-            -e '0,/- \\/s//- `Dockerfile64`/' \
-            -e '0,/- \\/s//- `README.md`/' pr-body.md
           prNumber="$(gh pr list --head "$BRANCH_NAME" --base master --json number --jq '.[0].number')"
           if [ -n "$prNumber" ] && [ "$prNumber" != "null" ]; then
             gh pr edit "$prNumber" --title "$PR_TITLE" --body-file pr-body.md
@@ -194,16 +186,16 @@ jobs:
           git commit -m "$PR_TITLE"
           git push --force-with-lease origin "$BRANCH_NAME"
           cat > pr-body.md <<EOF
-          Mise à jour automatique hebdomadaire de \
+          Mise à jour automatique hebdomadaire de \`DUPLICACY_VERSION\`.
 
-          - Version actuelle: \
-          - Nouvelle version: \
+          - Version actuelle: \`${CURRENT_VERSION}\`
+          - Nouvelle version: \`${LATEST_VERSION}\`
 
           Fichiers mis à jour:
-          - \
-          - \
-          - \
-          - \
+          - \`Dockerfile\`
+          - \`Dockerfile32\`
+          - \`Dockerfile64\`
+          - \`README.md\`
 
           Checklist:
           - [x] Removed unused imports and dead code
@@ -212,14 +204,6 @@ jobs:
           - [ ] Ran formatter/linter or declared they were not run
           - [x] Ensured change is a single, focused feature (one feature per commit)
           EOF
-          sed -i \
-            -e 's|Mise à jour automatique hebdomadaire de \\|Mise à jour automatique hebdomadaire de `DUPLICACY_VERSION`.|' \
-            -e "s|- Version actuelle: \\\\|- Version actuelle: \\`$CURRENT_VERSION\\`|" \
-            -e "s|- Nouvelle version: \\\\|- Nouvelle version: \\`$LATEST_VERSION\\`|" \
-            -e '0,/- \\/s//- `Dockerfile`/' \
-            -e '0,/- \\/s//- `Dockerfile32`/' \
-            -e '0,/- \\/s//- `Dockerfile64`/' \
-            -e '0,/- \\/s//- `README.md`/' pr-body.md
           prNumber="$(gh pr list --head "$BRANCH_NAME" --base master --json number --jq '.[0].number')"
           if [ -n "$prNumber" ] && [ "$prNumber" != "null" ]; then
             gh pr edit "$prNumber" --title "$PR_TITLE" --body-file pr-body.md

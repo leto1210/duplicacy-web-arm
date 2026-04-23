@@ -49,7 +49,7 @@ docker build -t duplicacy-web-arm:arm64 --build-arg ARCH=arm64 .
 
 GitHub Actions includes security controls for published images:
 
-- Trivy scans the published image for known vulnerabilities.
+- Trivy scans `latest-armv7` and `latest-arm64` for known vulnerabilities.
 
 ## Usage
 

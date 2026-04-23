@@ -15,6 +15,14 @@ permissions:
 jobs:
   scan:
     runs-on: self-hosted
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: armv7
+            image_tag: latest-armv7
+          - arch: arm64
+            image_tag: latest-arm64
 
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
 
@@ -22,7 +30,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-      - name: Scan Container Image
+      - name: Scan Container Image (${{ matrix.arch }})
         id: scan
         uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # 0.35.0
         env:
@@ -34,13 +42,13 @@ jobs:
           cache: true
           exit-code: 0
           ignore-unfixed: true
-          image-ref: docker.io/leto1210/duplicacy-web-arm:latest-arm64
+          image-ref: docker.io/leto1210/duplicacy-web-arm:${{ matrix.image_tag }}
           format: 'sarif'
-          output: 'duplicacy-web-arm_trivy-results.sarif'
+          output: 'duplicacy-web-arm_trivy-results-${{ matrix.arch }}.sarif'
           severity: 'CRITICAL,HIGH'
 
-      - name: Upload Trivy scan results to GitHub Security tab
+      - name: Upload Trivy scan results to GitHub Security tab (${{ matrix.arch }})
         uses: github/codeql-action/upload-sarif@c03c7286b23a2c4c2a10abb7eed1512b7580b4c5 # v3.34.1
         if: always()
         with:
-          sarif_file: 'duplicacy-web-arm_trivy-results.sarif'
+          sarif_file: 'duplicacy-web-arm_trivy-results-${{ matrix.arch }}.sarif'

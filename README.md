@@ -20,6 +20,10 @@ This project supports two ARM architectures:
 
 Versioned tags are also available in the form `leto1210/duplicacy-web-arm:<sha>-armv7` and `leto1210/duplicacy-web-arm:<sha>-arm64`.
 
+## Legacy (documenté)
+
+`Dockerfile32` et `Dockerfile64` sont conservés en mode legacy documenté (référence/historique et compatibilité). Le `Dockerfile` principal reste la source recommandée pour les builds actuels armv7/arm64 et pour la CI.
+
 ## Software Versions
 
 | Software | Version |

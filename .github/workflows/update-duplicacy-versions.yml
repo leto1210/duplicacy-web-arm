@@ -64,35 +64,64 @@ jobs:
           sed -E -i "s/(DUPLICACY_WEB_VERSION=)[0-9]+(\.[0-9]+)*/\\1${LATEST_VERSION}/g" Dockerfile Dockerfile32 Dockerfile64
           sed -E -i "s/\| duplicacy-web \| [0-9]+(\.[0-9]+)* \|/| duplicacy-web | ${LATEST_VERSION} |/" README.md
 
-      - name: Créer la Pull Request
+      - name: Créer ou mettre à jour la Pull Request
         if: steps.compare.outputs.needsUpdate == 'true'
-        uses: peter-evans/create-pull-request@22a9089034f40e5a961c8808d113e2c98fb63676 # v7
-        with:
-          commit-message: "chore: update DUPLICACY_WEB_VERSION to ${{ steps.latest.outputs.value }}"
-          branch: "chore/update-duplicacy-web-version"
-          delete-branch: true
-          title: "chore: update DUPLICACY_WEB_VERSION to ${{ steps.latest.outputs.value }}"
-          body: |
-            Mise à jour automatique hebdomadaire de `DUPLICACY_WEB_VERSION`.
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH_NAME: chore/update-duplicacy-web-version
+          PR_TITLE: 'chore: update DUPLICACY_WEB_VERSION to ${{ steps.latest.outputs.value }}'
+          CURRENT_VERSION: ${{ steps.current.outputs.value }}
+          LATEST_VERSION: ${{ steps.latest.outputs.value }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$BRANCH_NAME"
+          git add Dockerfile Dockerfile32 Dockerfile64 README.md
+          if git diff --cached --quiet; then
+            echo "Aucune modification à valider pour la PR Duplicacy Web."
+            exit 0
+          fi
+          git commit -m "$PR_TITLE"
+          git push --force-with-lease origin "$BRANCH_NAME"
+          cat > pr-body.md <<EOF
+          Mise à jour automatique hebdomadaire de \
 
-            - Version actuelle: `${{ steps.current.outputs.value }}`
-            - Nouvelle version: `${{ steps.latest.outputs.value }}`
+          - Version actuelle: \
+          - Nouvelle version: \
 
-            Fichiers mis à jour:
-            - `Dockerfile`
-            - `Dockerfile32`
-            - `Dockerfile64`
-            - `README.md`
+          Fichiers mis à jour:
+          - \
+          - \
+          - \
+          - \
 
-            Checklist:
-            - [x] Removed unused imports and dead code
-            - [x] Added/verified English docstrings for modified functions
-            - [x] Kept user-facing messages in French unchanged or improved in French
-            - [ ] Ran formatter/linter or declared they were not run
-            - [x] Ensured change is a single, focused feature (one feature per commit)
-          labels: |
-            dependencies
-            automated-pr
+          Checklist:
+          - [x] Removed unused imports and dead code
+          - [x] Added/verified English docstrings for modified functions
+          - [x] Kept user-facing messages in French unchanged or improved in French
+          - [ ] Ran formatter/linter or declared they were not run
+          - [x] Ensured change is a single, focused feature (one feature per commit)
+          EOF
+          sed -i \
+            -e 's|Mise à jour automatique hebdomadaire de \\|Mise à jour automatique hebdomadaire de `DUPLICACY_WEB_VERSION`.|' \
+            -e "s|- Version actuelle: \\\\|- Version actuelle: \\`$CURRENT_VERSION\\`|" \
+            -e "s|- Nouvelle version: \\\\|- Nouvelle version: \\`$LATEST_VERSION\\`|" \
+            -e '0,/- \\/s//- `Dockerfile`/' \
+            -e '0,/- \\/s//- `Dockerfile32`/' \
+            -e '0,/- \\/s//- `Dockerfile64`/' \
+            -e '0,/- \\/s//- `README.md`/' pr-body.md
+          prNumber="$(gh pr list --head "$BRANCH_NAME" --base master --json number --jq '.[0].number')"
+          if [ -n "$prNumber" ] && [ "$prNumber" != "null" ]; then
+            gh pr edit "$prNumber" --title "$PR_TITLE" --body-file pr-body.md
+            gh pr edit "$prNumber" --add-label dependencies --add-label automated-pr || true
+          else
+            gh pr create --base master --head "$BRANCH_NAME" --title "$PR_TITLE" --body-file pr-body.md
+            prNumber="$(gh pr list --head "$BRANCH_NAME" --base master --json number --jq '.[0].number')"
+            if [ -n "$prNumber" ] && [ "$prNumber" != "null" ]; then
+              gh pr edit "$prNumber" --add-label dependencies --add-label automated-pr || true
+            fi
+          fi
 
   update-duplicacy-cli-version:
     runs-on: ubuntu-latest
@@ -144,32 +173,61 @@ jobs:
           sed -E -i "s/(DUPLICACY_VERSION=)[0-9]+(\.[0-9]+)*/\\1${LATEST_VERSION}/g" Dockerfile Dockerfile32 Dockerfile64
           sed -E -i "s/\| duplicacy \| [0-9]+(\.[0-9]+)* \|/| duplicacy | ${LATEST_VERSION} |/" README.md
 
-      - name: Créer la Pull Request
+      - name: Créer ou mettre à jour la Pull Request
         if: steps.compare.outputs.needsUpdate == 'true'
-        uses: peter-evans/create-pull-request@22a9089034f40e5a961c8808d113e2c98fb63676 # v7
-        with:
-          commit-message: "chore: update DUPLICACY_VERSION to ${{ steps.latest.outputs.value }}"
-          branch: "chore/update-duplicacy-cli-version"
-          delete-branch: true
-          title: "chore: update DUPLICACY_VERSION to ${{ steps.latest.outputs.value }}"
-          body: |
-            Mise à jour automatique hebdomadaire de `DUPLICACY_VERSION`.
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH_NAME: chore/update-duplicacy-cli-version
+          PR_TITLE: 'chore: update DUPLICACY_VERSION to ${{ steps.latest.outputs.value }}'
+          CURRENT_VERSION: ${{ steps.current.outputs.value }}
+          LATEST_VERSION: ${{ steps.latest.outputs.value }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$BRANCH_NAME"
+          git add Dockerfile Dockerfile32 Dockerfile64 README.md
+          if git diff --cached --quiet; then
+            echo "Aucune modification à valider pour la PR Duplicacy CLI."
+            exit 0
+          fi
+          git commit -m "$PR_TITLE"
+          git push --force-with-lease origin "$BRANCH_NAME"
+          cat > pr-body.md <<EOF
+          Mise à jour automatique hebdomadaire de \
 
-            - Version actuelle: `${{ steps.current.outputs.value }}`
-            - Nouvelle version: `${{ steps.latest.outputs.value }}`
+          - Version actuelle: \
+          - Nouvelle version: \
 
-            Fichiers mis à jour:
-            - `Dockerfile`
-            - `Dockerfile32`
-            - `Dockerfile64`
-            - `README.md`
+          Fichiers mis à jour:
+          - \
+          - \
+          - \
+          - \
 
-            Checklist:
-            - [x] Removed unused imports and dead code
-            - [x] Added/verified English docstrings for modified functions
-            - [x] Kept user-facing messages in French unchanged or improved in French
-            - [ ] Ran formatter/linter or declared they were not run
-            - [x] Ensured change is a single, focused feature (one feature per commit)
-          labels: |
-            dependencies
-            automated-pr
+          Checklist:
+          - [x] Removed unused imports and dead code
+          - [x] Added/verified English docstrings for modified functions
+          - [x] Kept user-facing messages in French unchanged or improved in French
+          - [ ] Ran formatter/linter or declared they were not run
+          - [x] Ensured change is a single, focused feature (one feature per commit)
+          EOF
+          sed -i \
+            -e 's|Mise à jour automatique hebdomadaire de \\|Mise à jour automatique hebdomadaire de `DUPLICACY_VERSION`.|' \
+            -e "s|- Version actuelle: \\\\|- Version actuelle: \\`$CURRENT_VERSION\\`|" \
+            -e "s|- Nouvelle version: \\\\|- Nouvelle version: \\`$LATEST_VERSION\\`|" \
+            -e '0,/- \\/s//- `Dockerfile`/' \
+            -e '0,/- \\/s//- `Dockerfile32`/' \
+            -e '0,/- \\/s//- `Dockerfile64`/' \
+            -e '0,/- \\/s//- `README.md`/' pr-body.md
+          prNumber="$(gh pr list --head "$BRANCH_NAME" --base master --json number --jq '.[0].number')"
+          if [ -n "$prNumber" ] && [ "$prNumber" != "null" ]; then
+            gh pr edit "$prNumber" --title "$PR_TITLE" --body-file pr-body.md
+            gh pr edit "$prNumber" --add-label dependencies --add-label automated-pr || true
+          else
+            gh pr create --base master --head "$BRANCH_NAME" --title "$PR_TITLE" --body-file pr-body.md
+            prNumber="$(gh pr list --head "$BRANCH_NAME" --base master --json number --jq '.[0].number')"
+            if [ -n "$prNumber" ] && [ "$prNumber" != "null" ]; then
+              gh pr edit "$prNumber" --add-label dependencies --add-label automated-pr || true
+            fi
+          fi

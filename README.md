@@ -24,6 +24,8 @@ Versioned tags are also available in the form `leto1210/duplicacy-web-arm:<sha>-
 
 `Dockerfile32` et `Dockerfile64` sont conservés en mode legacy documenté (référence/historique et compatibilité). Le `Dockerfile` principal reste la source recommandée pour les builds actuels armv7/arm64 et pour la CI.
 
+Les images publiées et les builds CI utilisent `Dockerfile` avec `ARCH=armv7` ou `ARCH=arm64`.
+
 ## Software Versions
 
 | Software | Version |
@@ -54,6 +56,10 @@ docker build -t duplicacy-web-arm:arm64 --build-arg ARCH=arm64 .
 GitHub Actions includes security controls for published images:
 
 - Trivy scans `latest-armv7` and `latest-arm64` for known vulnerabilities.
+
+## Automated Version Updates
+
+A weekly workflow checks for new Duplicacy Web and Duplicacy CLI releases and opens a pull request when `DUPLICACY_WEB_VERSION` or `DUPLICACY_VERSION` changes.
 
 ## Usage
 

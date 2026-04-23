@@ -9,6 +9,8 @@
 
 Based on [saspus/duplicacy-web](https://bitbucket.org/saspus/duplicacy-web-docker-container/src/master/)
 
+Docker Hub registry: [leto1210/duplicacy-web-arm](https://hub.docker.com/r/leto1210/duplicacy-web-arm)
+
 ## Supported Architectures
 
 This project supports two ARM architectures:
@@ -64,6 +66,8 @@ A weekly workflow checks for new Duplicacy Web and Duplicacy CLI releases and op
 ## Usage
 
 ### From Docker Hub
+
+Docker Hub page: [hub.docker.com/r/leto1210/duplicacy-web-arm](https://hub.docker.com/r/leto1210/duplicacy-web-arm)
 
 ```bash
 # For 32-bit (armv7)

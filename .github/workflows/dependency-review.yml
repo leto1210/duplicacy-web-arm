@@ -19,5 +19,32 @@ jobs:
     steps:
       - name: 'Checkout Repository'
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 2
+
+      - name: 'Compute refs for non-PR runs'
+        id: refs
+        shell: bash
+        run: |
+          # Provide explicit refs when workflow is not triggered by pull_request.
+          baseRef="${{ github.event.pull_request.base.sha }}"
+          headRef="${{ github.event.pull_request.head.sha }}"
+
+          if [ -z "$baseRef" ] || [ -z "$headRef" ]; then
+            headRef="${{ github.sha }}"
+            if git rev-parse --verify HEAD^ >/dev/null 2>&1; then
+              baseRef="$(git rev-parse HEAD^)"
+            else
+              echo "Impossible de calculer une référence de base (HEAD^ introuvable)." >&2
+              exit 1
+            fi
+          fi
+
+          echo "base=$baseRef" >> "$GITHUB_OUTPUT"
+          echo "head=$headRef" >> "$GITHUB_OUTPUT"
+
       - name: 'Dependency Review'
         uses: actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48 # v4.9.0
+        with:
+          base-ref: ${{ steps.refs.outputs.base }}
+          head-ref: ${{ steps.refs.outputs.head }}

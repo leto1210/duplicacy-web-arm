@@ -1,0 +1,175 @@
+name: Mise à jour hebdomadaire des versions Duplicacy
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * 1"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: update-duplicacy-versions
+  cancel-in-progress: false
+
+jobs:
+  update-duplicacy-web-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Lire la version actuelle
+        id: current
+        shell: bash
+        run: |
+          currentVersion="$(grep -Eo 'DUPLICACY_WEB_VERSION=[0-9]+(\.[0-9]+)*' Dockerfile | head -n 1 | cut -d'=' -f2)"
+          if [ -z "$currentVersion" ]; then
+            echo "Impossible de lire DUPLICACY_WEB_VERSION dans Dockerfile" >&2
+            exit 1
+          fi
+          echo "value=$currentVersion" >> "$GITHUB_OUTPUT"
+
+      - name: Récupérer la dernière version disponible
+        id: latest
+        shell: bash
+        run: |
+          latestVersion="$(curl -fsSL 'https://forum.duplicacy.com/c/announcement/8.rss' | grep -Eo 'Duplicacy Web Edition [0-9]+(\.[0-9]+)*' | head -n 1 | awk '{print $4}')"
+          if [ -z "$latestVersion" ]; then
+            echo "Impossible de récupérer la dernière version Duplicacy Web" >&2
+            exit 1
+          fi
+          echo "value=$latestVersion" >> "$GITHUB_OUTPUT"
+
+      - name: Vérifier si une mise à jour est nécessaire
+        id: compare
+        shell: bash
+        run: |
+          if [ "${{ steps.current.outputs.value }}" = "${{ steps.latest.outputs.value }}" ]; then
+            echo "needsUpdate=false" >> "$GITHUB_OUTPUT"
+            echo "Aucune mise à jour Duplicacy Web à appliquer."
+          else
+            echo "needsUpdate=true" >> "$GITHUB_OUTPUT"
+            echo "Nouvelle version détectée: ${{ steps.latest.outputs.value }}"
+          fi
+
+      - name: Mettre à jour les fichiers du projet
+        if: steps.compare.outputs.needsUpdate == 'true'
+        shell: bash
+        env:
+          LATEST_VERSION: ${{ steps.latest.outputs.value }}
+        run: |
+          sed -E -i "s/(DUPLICACY_WEB_VERSION=)[0-9]+(\.[0-9]+)*/\\1${LATEST_VERSION}/g" Dockerfile Dockerfile32 Dockerfile64
+          sed -E -i "s/\| duplicacy-web \| [0-9]+(\.[0-9]+)* \|/| duplicacy-web | ${LATEST_VERSION} |/" README.md
+
+      - name: Créer la Pull Request
+        if: steps.compare.outputs.needsUpdate == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: "chore: update DUPLICACY_WEB_VERSION to ${{ steps.latest.outputs.value }}"
+          branch: "chore/update-duplicacy-web-version"
+          delete-branch: true
+          title: "chore: update DUPLICACY_WEB_VERSION to ${{ steps.latest.outputs.value }}"
+          body: |
+            Mise à jour automatique hebdomadaire de `DUPLICACY_WEB_VERSION`.
+
+            - Version actuelle: `${{ steps.current.outputs.value }}`
+            - Nouvelle version: `${{ steps.latest.outputs.value }}`
+
+            Fichiers mis à jour:
+            - `Dockerfile`
+            - `Dockerfile32`
+            - `Dockerfile64`
+            - `README.md`
+
+            Checklist:
+            - [x] Removed unused imports and dead code
+            - [x] Added/verified English docstrings for modified functions
+            - [x] Kept user-facing messages in French unchanged or improved in French
+            - [ ] Ran formatter/linter or declared they were not run
+            - [x] Ensured change is a single, focused feature (one feature per commit)
+          labels: |
+            dependencies
+            automated-pr
+
+  update-duplicacy-cli-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Lire la version actuelle
+        id: current
+        shell: bash
+        run: |
+          currentVersion="$(grep -Eo 'DUPLICACY_VERSION=[0-9]+(\.[0-9]+)*' Dockerfile | head -n 1 | cut -d'=' -f2)"
+          if [ -z "$currentVersion" ]; then
+            echo "Impossible de lire DUPLICACY_VERSION dans Dockerfile" >&2
+            exit 1
+          fi
+          echo "value=$currentVersion" >> "$GITHUB_OUTPUT"
+
+      - name: Récupérer la dernière version disponible
+        id: latest
+        shell: bash
+        run: |
+          latestVersion="$(curl -fsSL 'https://api.github.com/repos/gilbertchen/duplicacy/releases/latest' | jq -r '.tag_name' | sed 's/^v//')"
+          if [ -z "$latestVersion" ] || [ "$latestVersion" = "null" ]; then
+            echo "Impossible de récupérer la dernière version Duplicacy CLI" >&2
+            exit 1
+          fi
+          echo "value=$latestVersion" >> "$GITHUB_OUTPUT"
+
+      - name: Vérifier si une mise à jour est nécessaire
+        id: compare
+        shell: bash
+        run: |
+          if [ "${{ steps.current.outputs.value }}" = "${{ steps.latest.outputs.value }}" ]; then
+            echo "needsUpdate=false" >> "$GITHUB_OUTPUT"
+            echo "Aucune mise à jour Duplicacy CLI à appliquer."
+          else
+            echo "needsUpdate=true" >> "$GITHUB_OUTPUT"
+            echo "Nouvelle version détectée: ${{ steps.latest.outputs.value }}"
+          fi
+
+      - name: Mettre à jour les fichiers du projet
+        if: steps.compare.outputs.needsUpdate == 'true'
+        shell: bash
+        env:
+          LATEST_VERSION: ${{ steps.latest.outputs.value }}
+        run: |
+          sed -E -i "s/(DUPLICACY_VERSION=)[0-9]+(\.[0-9]+)*/\\1${LATEST_VERSION}/g" Dockerfile Dockerfile32 Dockerfile64
+          sed -E -i "s/\| duplicacy \| [0-9]+(\.[0-9]+)* \|/| duplicacy | ${LATEST_VERSION} |/" README.md
+
+      - name: Créer la Pull Request
+        if: steps.compare.outputs.needsUpdate == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: "chore: update DUPLICACY_VERSION to ${{ steps.latest.outputs.value }}"
+          branch: "chore/update-duplicacy-cli-version"
+          delete-branch: true
+          title: "chore: update DUPLICACY_VERSION to ${{ steps.latest.outputs.value }}"
+          body: |
+            Mise à jour automatique hebdomadaire de `DUPLICACY_VERSION`.
+
+            - Version actuelle: `${{ steps.current.outputs.value }}`
+            - Nouvelle version: `${{ steps.latest.outputs.value }}`
+
+            Fichiers mis à jour:
+            - `Dockerfile`
+            - `Dockerfile32`
+            - `Dockerfile64`
+            - `README.md`
+
+            Checklist:
+            - [x] Removed unused imports and dead code
+            - [x] Added/verified English docstrings for modified functions
+            - [x] Kept user-facing messages in French unchanged or improved in French
+            - [ ] Ran formatter/linter or declared they were not run
+            - [x] Ensured change is a single, focused feature (one feature per commit)
+          labels: |
+            dependencies
+            automated-pr

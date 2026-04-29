@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
+IFS=$'\n\t'
+umask 027
 
 child=0
 usrId="${USR_ID:-0}"
@@ -19,6 +21,35 @@ terminator() {
 }
 
 trap terminator SIGHUP SIGINT SIGQUIT SIGTERM
+
+# validate_runtime_prerequisites: Validate required binaries and numeric identifiers.
+# Params: none.
+# Returns: none.
+# Errors: exits when a binary is missing or IDs are invalid.
+validate_runtime_prerequisites() {
+  local binary
+  for binary in addgroup adduser chown dbus-uuidgen id mkdir su-exec; do
+    if ! command -v "$binary" >/dev/null 2>&1; then
+      echo "Binaire requis introuvable: ${binary}" >&2
+      exit 1
+    fi
+  done
+
+  if ! [[ "$usrId" =~ ^[0-9]+$ ]]; then
+    echo "USR_ID invalide: ${usrId}" >&2
+    exit 1
+  fi
+
+  if ! [[ "$grpId" =~ ^[0-9]+$ ]]; then
+    echo "GRP_ID invalide: ${grpId}" >&2
+    exit 1
+  fi
+
+  if [ "$usrId" -ne 0 ] && [ "$grpId" -eq 0 ]; then
+    grpId="$usrId"
+    echo "GRP_ID absent, utilisation de la valeur USR_ID (${grpId})."
+  fi
+}
 
 # log_user_context: Log the effective user and group.
 # Params: none.
@@ -47,10 +78,11 @@ reset_userbase() {
 # Returns: none.
 # Errors: exits on adduser/addgroup failure.
 ensure_user_group() {
-  if [ "$grpId" -ne 0 ]; then
+  if [ "$grpId" -ne 0 ] && ! grep -qE "^[^:]+:[^:]*:${grpId}:" /etc/group; then
     addgroup -g "$grpId" -S duplicacy
   fi
-  if [ "$usrId" -ne 0 ]; then
+
+  if [ "$usrId" -ne 0 ] && ! grep -qE "^[^:]+:[^:]*:${usrId}:" /etc/passwd; then
     adduser -u "$usrId" -S duplicacy -G duplicacy
   fi
 }
@@ -87,6 +119,7 @@ start_child() {
 }
 
 log_user_context
+validate_runtime_prerequisites
 reset_userbase
 ensure_user_group
 ensure_directories

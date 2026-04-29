@@ -1,5 +1,21 @@
 #!/usr/bin/env bash
 set -euo pipefail
+IFS=$'\n\t'
+umask 027
+
+# validate_runtime_prerequisites: Validate required binaries before startup.
+# Params: none.
+# Returns: none.
+# Errors: exits when a binary is missing.
+validate_runtime_prerequisites() {
+  local binary
+  for binary in duplicacy_web id ln tail touch; do
+    if ! command -v "$binary" >/dev/null 2>&1; then
+      echo "Binaire requis introuvable: ${binary}" >&2
+      exit 1
+    fi
+  done
+}
 
 # log_user_context: Log the effective user and group.
 # Params: none.
@@ -30,6 +46,24 @@ ensure_config_symlink() {
 # Errors: exits on failure to create the file.
 ensure_log_file() {
   touch /logs/duplicacy_web.log
+}
+
+# validate_filesystem_access: Validate required directories are writable.
+# Params: none.
+# Returns: none.
+# Errors: exits when a required path is not writable.
+validate_filesystem_access() {
+  local path
+  for path in /config /logs /cache; do
+    if [ ! -d "$path" ]; then
+      echo "Répertoire requis absent: ${path}" >&2
+      exit 1
+    fi
+    if [ ! -w "$path" ]; then
+      echo "Répertoire non accessible en écriture: ${path}" >&2
+      exit 1
+    fi
+  done
 }
 
 # write_default_settings: Create default settings if missing.
@@ -77,6 +111,8 @@ start_duplicacy_web() {
 }
 
 log_user_context
+validate_runtime_prerequisites
+validate_filesystem_access
 ensure_config_symlink
 ensure_log_file
 write_default_settings

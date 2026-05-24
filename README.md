@@ -57,11 +57,13 @@ docker build -t duplicacy-web-arm:arm64 --build-arg ARCH=arm64 .
 
 GitHub Actions includes security controls for published images:
 
-- Trivy scans `latest-armv7` and `latest-arm64` for known vulnerabilities.
+- Trivy scans `latest-armv7` and `latest-arm64` for CRITICAL and HIGH vulnerabilities after each successful build. Fixable findings block the workflow.
+- All GitHub Actions are pinned to commit SHAs to reduce supply-chain risk.
+- Downloaded binaries are verified against SHA256 checksums before being made executable.
 
 ## Automated Version Updates
 
-A weekly workflow checks for new Duplicacy Web and Duplicacy CLI releases and opens a pull request when `DUPLICACY_WEB_VERSION` or `DUPLICACY_VERSION` changes.
+A weekly workflow checks for new Duplicacy Web and Duplicacy CLI releases and opens a pull request when `DUPLICACY_WEB_VERSION` or `DUPLICACY_VERSION` changes. The workflow also fetches and updates the SHA256 checksums for both architectures automatically.
 
 ## Usage
 

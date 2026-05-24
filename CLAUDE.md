@@ -30,7 +30,7 @@ Binary integrity is verified at build time via `sha256sum`. SHA256 hashes are st
 
 ## Version Updates
 
-When bumping `DUPLICACY_WEB_VERSION` or `DUPLICACY_VERSION`, update **all three** files: `Dockerfile`, `Dockerfile32`, `Dockerfile64`, and `README.md`. The weekly CI workflow (`update-duplicacy-versions.yml`) automates this and opens a PR. SHA256 hashes must also be updated manually in `Dockerfile` when versions change.
+When bumping `DUPLICACY_WEB_VERSION` or `DUPLICACY_VERSION`, update **all three** Dockerfiles and `README.md`. The weekly CI workflow (`update-duplicacy-versions.yml`) automates this: it bumps version strings **and** fetches and patches the 4 SHA256 ARG values in all three Dockerfiles. If bumping manually, compute the SHA256 for each binary (`wget` then `sha256sum`) and update the ARG values accordingly.
 
 ## CI Workflows
 
@@ -49,4 +49,8 @@ CI runs on `self-hosted` runners (ARM). All GitHub Actions are pinned to commit 
 - **Language split**: code and comments in English; user-facing messages (shell `echo` output visible at runtime) in French.
 - Shell scripts use `set -euo pipefail` and `IFS=$'\n\t'`. Every function has an English docstring comment block (purpose, params, returns, errors).
 - Do not introduce new external GitHub Actions without checking the organization allowlist first. Prefer `git`, `gh`, or inline shell over third-party actions.
-- Keep `Dockerfile32`/`Dockerfile64` in sync with `Dockerfile` for version strings only — do not add new features to them.
+- All GitHub Actions must be pinned to full commit SHAs with a `# vX.Y.Z` version comment.
+- Keep `Dockerfile32`/`Dockerfile64` in sync with `Dockerfile`: version strings, SHA256 ARGs, and Alpine patch version must all match.
+- All downloaded binaries must be verified with `sha256sum -c` before `chmod +x` — this applies to all three Dockerfiles.
+- Base images are pinned to exact patch versions (e.g., `alpine:3.23.4`). Update the patch version across all three Dockerfiles when Alpine releases a new patch.
+- `.dockerignore` excludes `.git`, `.github`, legacy Dockerfiles, and documentation from the build context — keep it current if new files are added at the repo root.

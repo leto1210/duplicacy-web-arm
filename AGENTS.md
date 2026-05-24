@@ -15,9 +15,6 @@ docker build -t duplicacy-web-arm:armv7 --build-arg ARCH=armv7 .
 
 # Build for ARM 64-bit (arm64)
 docker build -t duplicacy-web-arm:arm64 --build-arg ARCH=arm64 .
-
-# Build using buildx for multi-platform
-docker buildx build --platform linux/arm/v7,linux/arm64 -t duplicacy-web-arm:latest .
 ```
 
 ### Test Commands
@@ -31,105 +28,63 @@ docker run --rm -p 3875:3875 -e USR_ID=1000 -e GRP_ID=1000 \
 docker run --rm -p 3875:3875 -e USR_ID=1000 -e GRP_ID=1000 \
   -v /tmp/test-config:/config -v /tmp/test-logs:/logs \
   duplicacy-web-arm:arm64
-
-# Test with full volume mounts
-docker run --name duplicacy-web-arm-test -h duplicacy-web-arm \
-  -e TZ=Europe/Paris -p 3875:3875/tcp -e USR_ID=1000 -e GRP_ID=1000 \
-  -v ~/Library/Duplicacy:/config -v ~/Library/Logs/Duplicacy/:/logs \
-  -v ~/Library/Caches/Duplicacy:/cache -v ~:/backuproot:ro \
-  --restart always duplicacy-web-arm:armv7
 ```
 
-### CI/CD Commands
-The project uses GitHub Actions for automated builds. The workflow is triggered on:
-- Push to master branch
-- Pull requests to master branch
+### Script Syntax Check
+```bash
+bash -n init.sh
+bash -n launch.sh
+```
 
 ## Code Style Guidelines
 
 ### Dockerfile Style
 - Use multi-stage builds with architecture-specific base images
-- Define build arguments at the top with clear defaults
-- Group related RUN instructions with && for layer optimization
+- Define build arguments at the top with clear defaults, including SHA256 ARG values for each architecture
+- Group related RUN instructions with `&&` for layer optimization
 - Use French comments where existing (maintain consistency)
 - Keep environment variables grouped by purpose
-- Use specific version tags for base images (e.g., `alpine:3.23`)
+- Pin base images to exact patch versions (e.g., `alpine:3.23.4`, not `alpine:3.23`)
 
 ### Shell Script Style
-- Use `#!/usr/bin/env bash` shebang
+- Use `#!/usr/bin/env bash` shebang with `set -euo pipefail` and `IFS=$'\n\t'`
+- Every function must have an English docstring comment: purpose, params, returns, errors
 - Function names use snake_case with descriptive names
-- Error handling with explicit exit codes
 - Use quotes around variable expansions: `"$VAR"`
 - Indent with 2 spaces (consistent with existing scripts)
-- Add echo statements for debugging and transparency
+- User-facing `echo` output must be in French; code, comments, and docstrings in English
 
-### File Organization
-```
-/
-├── Dockerfile              # Main unified Dockerfile
-├── Dockerfile32           # Legacy ARM 32-bit Dockerfile
-├── Dockerfile64           # Legacy ARM 64-bit Dockerfile
-├── init.sh                # Container initialization script
-├── launch.sh              # Application launch script
-├── README.md              # Project documentation
-├── LICENSE                # MIT License
-├── .github/
-│   └── workflows/         # CI/CD configurations
-└── .gitignore            # Git ignore patterns
-```
-
-### Naming Conventions
-- **Images**: `duplicacy-web-arm:{version}-{arch}` and `duplicacy-web-arm:latest-{arch}`
-- **Containers**: Use descriptive names with `-arm` suffix
-- **Environment Variables**: UPPER_SNAKE_CASE (e.g., `USR_ID`, `GRP_ID`)
-- **Shell Functions**: snake_case with descriptive names (e.g., `terminator`)
-- **Files**: lowercase with underscores or hyphens
-
-### Error Handling
-- Always check download success with exit codes
-- Use conditional logic for architecture-specific operations
-- Implement proper signal handling in shell scripts
-- Validate required directories and files exist
-- Use explicit error messages with context
-
-### Security Best Practices
-- Run containers as non-root user when possible (USR_ID/GRP_ID)
-- Use minimal base images (Alpine Linux)
-- Clean up package caches and temporary files
-- Avoid logging sensitive information
-- Use read-only mounts where appropriate
+### Security Requirements
+- All downloaded binaries must be verified with `sha256sum -c` before `chmod +x`
+- SHA256 values are stored as `ARG` at the top of each Dockerfile and must be updated with every version bump
+- Run containers as non-root user when possible (USR_ID/GRP_ID via `su-exec`)
+- Use minimal base images (Alpine Linux, pinned to exact patch version)
+- Clean up apk caches and temp files in the same RUN layer as the install
+- All GitHub Actions must be pinned to full commit SHAs with a `# vX.Y.Z` comment
 
 ### Version Management
-- Duplicacy Web version: Defined in `DUPLICACY_WEB_VERSION` env var
-- Duplicacy CLI version: Defined in `DUPLICACY_VERSION` env var
-- Base image versions: Use specific tags (e.g., `alpine:3.23`)
-- Update versions in Dockerfile, not in separate files
-
-### Testing Guidelines
-- Test both architectures (armv7 and arm64)
-- Verify container startup and basic functionality
-- Test volume mounts and permissions
-- Validate configuration file generation
-- Test with different user/group IDs
+- `DUPLICACY_WEB_VERSION` and `DUPLICACY_VERSION` are defined as `ENV` in each Dockerfile
+- SHA256 ARG values for both architectures sit at the top of `Dockerfile`, `Dockerfile32`, and `Dockerfile64`
+- When bumping versions manually: update the version strings **and** the SHA256 ARGs in all three Dockerfiles
+- The weekly workflow (`update-duplicacy-versions.yml`) handles both version strings and SHA256 updates automatically
 
 ## Development Workflow
 
-1. **Changes to Dockerfile**: Test builds for both architectures
-2. **Script Changes**: Verify syntax with `bash -n`
-3. **Version Updates**: Update env vars in Dockerfile
-4. **CI Changes**: Test workflow syntax and triggers
-5. **Documentation**: Keep README.md in sync with changes
+1. **Changes to Dockerfile**: Test builds for both architectures before committing
+2. **Script changes**: Verify syntax with `bash -n`
+3. **Version bumps**: Update version strings and SHA256 ARGs together in all three Dockerfiles
+4. **CI changes**: Run `actionlint` locally or push to a branch to trigger the linting workflow
+5. **Documentation**: Keep README.md, MAINTENANCE.md, AGENTS.md, and CLAUDE.md in sync with any behavioral changes
 
 ## Common Issues
 
-- **Architecture Mismatch**: Ensure correct ARCH build argument
-- **Permission Errors**: Verify USR_ID/GRP_ID settings
-- **Download Failures**: Check URLs and network connectivity
-- **Volume Mounts**: Ensure host directories exist and have correct permissions
+- **SHA256 mismatch**: Ensure `ARG DUPLICACY_*_SHA256_*` values in all Dockerfiles match the actual binaries for the specified version
+- **Architecture mismatch**: Ensure the correct `ARCH` build argument is passed
+- **Permission errors**: Verify `USR_ID`/`GRP_ID` settings and that host volume directories exist with correct permissions
+- **Download failures**: Check network connectivity and that the version exists at the upstream URLs
 
 ## Maintenance
 
-- Regularly update base Alpine image versions
-- Monitor Duplicacy releases for security updates
-- Test new Docker versions for compatibility
-- Review GitHub Actions workflow updates
+- When Alpine releases a new patch (e.g., `3.23.5`), update the pinned tag in `Dockerfile`, `Dockerfile32`, and `Dockerfile64`
+- When upgrading a GitHub Action, retrieve the new commit SHA via the GitHub API and update both the SHA and the version comment
+- Monitor Duplicacy releases for security updates; the weekly workflow will open a PR automatically

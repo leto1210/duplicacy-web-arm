@@ -1,8 +1,10 @@
 # Définir l'architecture cible (par défaut armv7)
 ARG ARCH=armv7
+ARG DUPLICACY_WEB_SHA256_ARM=b1a529eb1f102d3529002eb763f78934df2268c767f610c92e451e7a50035b8d
+ARG DUPLICACY_SHA256_ARM=34ba5c2953c3b3fb9ea383b014f286c7b646b2ea95e6d75d0da22e9b8ca4f919
 
 # Choisir l'image Alpine en fonction de l'architecture
-FROM arm32v7/alpine:3.23 AS base-armv7
+FROM arm32v7/alpine:3.23.4 AS base-armv7
 
 # Utiliser l'image appropriée en fonction de $ARCH pour 32 bits
 FROM base-armv7 AS builder-armv7
@@ -24,15 +26,19 @@ ENV TZ="Europe/Paris"
 RUN apk update && \
     apk add --no-cache bash ca-certificates dbus su-exec tzdata wget
 
-# Vérifiez la valeur de ARCH
-#RUN echo "ARCH is armv7"
-
-# Télécharger les binaires appropriés pour armv7
-RUN echo "Downloading for armv7"; \
-    wget -nv -O /usr/local/bin/duplicacy_web https://acrosync.com/duplicacy-web/duplicacy_web_linux_arm_${DUPLICACY_WEB_VERSION} 2>&1; \
-    if [ $? -ne 0 ]; then echo "Failed to download duplicacy_web for armv7" && exit 1; fi; \
-    wget -nv -O /usr/local/bin/duplicacy https://github.com/gilbertchen/duplicacy/releases/download/v${DUPLICACY_VERSION}/duplicacy_linux_arm_${DUPLICACY_VERSION} 2>&1; \
-    if [ $? -ne 0 ]; then echo "Failed to download duplicacy for armv7" && exit 1; fi
+ARG DUPLICACY_WEB_SHA256_ARM
+ARG DUPLICACY_SHA256_ARM
+# Télécharger et vérifier les binaires pour armv7
+RUN set -e; \
+    echo "Téléchargement pour armv7"; \
+    if ! wget -nv -O /usr/local/bin/duplicacy_web "https://acrosync.com/duplicacy-web/duplicacy_web_linux_arm_${DUPLICACY_WEB_VERSION}"; then \
+      echo "Échec du téléchargement de duplicacy_web pour armv7" >&2; exit 1; \
+    fi; \
+    if ! wget -nv -O /usr/local/bin/duplicacy "https://github.com/gilbertchen/duplicacy/releases/download/v${DUPLICACY_VERSION}/duplicacy_linux_arm_${DUPLICACY_VERSION}"; then \
+      echo "Échec du téléchargement de duplicacy pour armv7" >&2; exit 1; \
+    fi; \
+    echo "${DUPLICACY_WEB_SHA256_ARM}  /usr/local/bin/duplicacy_web" | sha256sum -c -; \
+    echo "${DUPLICACY_SHA256_ARM}  /usr/local/bin/duplicacy" | sha256sum -c -
 
 RUN chmod +x /usr/local/bin/duplicacy_web /usr/local/bin/duplicacy && \
     rm -f /var/lib/dbus/machine-id && ln -s /config/machine-id /var/lib/dbus/machine-id

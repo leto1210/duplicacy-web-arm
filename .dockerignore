@@ -1,0 +1,8 @@
+.git
+.github
+.vscode
+Dockerfile32
+Dockerfile64
+*.md
+LICENSE
+AGENTS.md

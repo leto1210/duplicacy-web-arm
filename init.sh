@@ -61,7 +61,7 @@ log_user_context() {
   groupName="$(id -gn)"
   userId="$(id -u)"
   groupId="$(id -g)"
-  echo "launch.sh en cours d'exécution en tant que ${userName}:${groupName} (${userId}:${groupId})"
+  echo "init.sh en cours d'exécution en tant que ${userName}:${groupName} (${userId}:${groupId})"
 }
 
 # reset_userbase: Reset /etc/passwd and /etc/group to minimal entries.

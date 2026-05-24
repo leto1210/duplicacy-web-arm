@@ -64,6 +64,34 @@ jobs:
           sed -E -i "s/(DUPLICACY_WEB_VERSION=)[0-9]+(\.[0-9]+)*/\\1${LATEST_VERSION}/g" Dockerfile Dockerfile32 Dockerfile64
           sed -E -i "s/\| duplicacy-web \| [0-9]+(\.[0-9]+)* \|/| duplicacy-web | ${LATEST_VERSION} |/" README.md
 
+      - name: Calculer les SHA256 des nouveaux binaires duplicacy_web
+        if: steps.compare.outputs.needsUpdate == 'true'
+        id: sha_web
+        shell: bash
+        env:
+          LATEST_VERSION: ${{ steps.latest.outputs.value }}
+        run: |
+          tmpDir="$(mktemp -d)"
+          wget -nv -O "${tmpDir}/duplicacy_web_arm" \
+            "https://acrosync.com/duplicacy-web/duplicacy_web_linux_arm_${LATEST_VERSION}"
+          wget -nv -O "${tmpDir}/duplicacy_web_arm64" \
+            "https://acrosync.com/duplicacy-web/duplicacy_web_linux_arm64_${LATEST_VERSION}"
+          shaArm="$(sha256sum "${tmpDir}/duplicacy_web_arm" | awk '{print $1}')"
+          shaArm64="$(sha256sum "${tmpDir}/duplicacy_web_arm64" | awk '{print $1}')"
+          rm -rf "${tmpDir}"
+          echo "arm=${shaArm}" >> "$GITHUB_OUTPUT"
+          echo "arm64=${shaArm64}" >> "$GITHUB_OUTPUT"
+
+      - name: Mettre à jour les SHA256 duplicacy_web dans Dockerfile
+        if: steps.compare.outputs.needsUpdate == 'true'
+        shell: bash
+        env:
+          SHA_ARM: ${{ steps.sha_web.outputs.arm }}
+          SHA_ARM64: ${{ steps.sha_web.outputs.arm64 }}
+        run: |
+          sed -E -i "s/(ARG DUPLICACY_WEB_SHA256_ARM=)[a-f0-9]{64}/\1${SHA_ARM}/" Dockerfile Dockerfile32
+          sed -E -i "s/(ARG DUPLICACY_WEB_SHA256_ARM64=)[a-f0-9]{64}/\1${SHA_ARM64}/" Dockerfile Dockerfile64
+
       - name: Créer ou mettre à jour la Pull Request
         if: steps.compare.outputs.needsUpdate == 'true'
         shell: bash
@@ -164,6 +192,34 @@ jobs:
         run: |
           sed -E -i "s/(DUPLICACY_VERSION=)[0-9]+(\.[0-9]+)*/\\1${LATEST_VERSION}/g" Dockerfile Dockerfile32 Dockerfile64
           sed -E -i "s/\| duplicacy \| [0-9]+(\.[0-9]+)* \|/| duplicacy | ${LATEST_VERSION} |/" README.md
+
+      - name: Calculer les SHA256 des nouveaux binaires duplicacy CLI
+        if: steps.compare.outputs.needsUpdate == 'true'
+        id: sha_cli
+        shell: bash
+        env:
+          LATEST_VERSION: ${{ steps.latest.outputs.value }}
+        run: |
+          tmpDir="$(mktemp -d)"
+          wget -nv -O "${tmpDir}/duplicacy_arm" \
+            "https://github.com/gilbertchen/duplicacy/releases/download/v${LATEST_VERSION}/duplicacy_linux_arm_${LATEST_VERSION}"
+          wget -nv -O "${tmpDir}/duplicacy_arm64" \
+            "https://github.com/gilbertchen/duplicacy/releases/download/v${LATEST_VERSION}/duplicacy_linux_arm64_${LATEST_VERSION}"
+          shaArm="$(sha256sum "${tmpDir}/duplicacy_arm" | awk '{print $1}')"
+          shaArm64="$(sha256sum "${tmpDir}/duplicacy_arm64" | awk '{print $1}')"
+          rm -rf "${tmpDir}"
+          echo "arm=${shaArm}" >> "$GITHUB_OUTPUT"
+          echo "arm64=${shaArm64}" >> "$GITHUB_OUTPUT"
+
+      - name: Mettre à jour les SHA256 duplicacy CLI dans Dockerfile
+        if: steps.compare.outputs.needsUpdate == 'true'
+        shell: bash
+        env:
+          SHA_ARM: ${{ steps.sha_cli.outputs.arm }}
+          SHA_ARM64: ${{ steps.sha_cli.outputs.arm64 }}
+        run: |
+          sed -E -i "s/(ARG DUPLICACY_SHA256_ARM=)[a-f0-9]{64}/\1${SHA_ARM}/" Dockerfile Dockerfile32
+          sed -E -i "s/(ARG DUPLICACY_SHA256_ARM64=)[a-f0-9]{64}/\1${SHA_ARM64}/" Dockerfile Dockerfile64
 
       - name: Créer ou mettre à jour la Pull Request
         if: steps.compare.outputs.needsUpdate == 'true'

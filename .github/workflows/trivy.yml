@@ -10,6 +10,7 @@ on:
 
 permissions:
   contents: read
+  packages: write
   security-events: write
 
 jobs:
@@ -48,7 +49,7 @@ jobs:
           severity: 'CRITICAL,HIGH'
 
       - name: Upload Trivy scan results to GitHub Security tab (${{ matrix.arch }})
-        uses: github/codeql-action/upload-sarif@03e4368ac7daa2bd82b3e85186f0e49e48 # v3.36.0
+        uses: github/codeql-action/upload-sarif@f52b05f4acaaa234e44466e66d29050e135ea9ef # v4.36.0
         if: always()
         with:
           sarif_file: 'duplicacy-web-arm_trivy-results-${{ matrix.arch }}.sarif'

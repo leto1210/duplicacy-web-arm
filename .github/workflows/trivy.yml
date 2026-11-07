@@ -50,6 +50,7 @@ jobs:
           format: 'sarif'
           output: 'duplicacy-web-arm_trivy-results-${{ matrix.arch }}.sarif'
           severity: 'CRITICAL,HIGH'
+          timeout: 20m # default 5m is too short for the large Go binaries on the ARM runner
 
       - name: Upload Trivy scan results to GitHub Security tab (${{ matrix.arch }})
         uses: github/codeql-action/upload-sarif@f52b05f4acaaa234e44466e66d29050e135ea9ef # v4.36.0

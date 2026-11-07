@@ -18,6 +18,7 @@ jobs:
     runs-on: self-hosted
     strategy:
       fail-fast: false
+      max-parallel: 1
       matrix:
         include:
           - arch: armv7
@@ -44,6 +45,7 @@ jobs:
           exit-code: 1
           ignore-unfixed: true
           image-ref: docker.io/leto1210/duplicacy-web-arm:${{ matrix.image_tag }}
+          scanners: vuln # skip slow secret scanning of the large duplicacy binary
           format: 'sarif'
           output: 'duplicacy-web-arm_trivy-results-${{ matrix.arch }}.sarif'
           severity: 'CRITICAL,HIGH'

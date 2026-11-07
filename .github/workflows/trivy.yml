@@ -43,7 +43,6 @@ jobs:
         with:
           cache: true
           exit-code: 1
-          timeout: 20m # default 5m is too short for DB download + scan on the Pi
           ignore-unfixed: true
           image-ref: docker.io/leto1210/duplicacy-web-arm:${{ matrix.image_tag }}
           scanners: vuln # skip slow secret scanning of the large duplicacy binary

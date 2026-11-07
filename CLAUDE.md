@@ -16,7 +16,17 @@ docker build -t duplicacy-web-arm:armv7 --build-arg ARCH=armv7 .
 docker build -t duplicacy-web-arm:arm64 --build-arg ARCH=arm64 .
 ```
 
-There are no tests, linters, or formatters to run locally. CI handles workflow linting via `actionlint`.
+There are no unit tests or formatters. Local checks:
+
+```bash
+bash -n init.sh && bash -n launch.sh      # script syntax
+actionlint                                # workflow lint (same as CI), if installed
+# smoke test: UI on :3875, volumes /config /logs /cache
+docker run --rm -p 3875:3875 -e USR_ID=1000 -e GRP_ID=1000 \
+  -v /tmp/test-config:/config -v /tmp/test-logs:/logs duplicacy-web-arm:arm64
+```
+
+The image defines a `HEALTHCHECK` (wget on `127.0.0.1:3875`), so `docker ps` shows health once started. Building requires an ARM-capable builder (base images are `arm32v7/alpine` / `arm64v8/alpine`); on x86 use buildx/QEMU.
 
 ## Architecture
 
@@ -40,6 +50,7 @@ When bumping `DUPLICACY_WEB_VERSION` or `DUPLICACY_VERSION`, update **all three*
 | `trivy.yml` | scheduled + push | Scan `latest-armv7` and `latest-arm64` for vulnerabilities |
 | `update-duplicacy-versions.yml` | weekly Monday 06:00 UTC | Check upstream releases and open PRs |
 | `actionlint.yml` | push/PR | Lint all workflow YAML files |
+| `CacheTrivyDB.yml` | daily 05:00 UTC (runs on `ubuntu-latest`) | Cache the Trivy vulnerability DB for `trivy.yml` |
 | `dependency-review.yml` | PR | Review dependency changes |
 
 CI runs on `self-hosted` runners (ARM). All GitHub Actions are pinned to commit SHAs.
@@ -53,4 +64,5 @@ CI runs on `self-hosted` runners (ARM). All GitHub Actions are pinned to commit 
 - Keep `Dockerfile32`/`Dockerfile64` in sync with `Dockerfile`: version strings, SHA256 ARGs, and Alpine patch version must all match.
 - All downloaded binaries must be verified with `sha256sum -c` before `chmod +x` — this applies to all three Dockerfiles.
 - Base images are pinned to exact patch versions (e.g., `alpine:3.23.4`). Update the patch version across all three Dockerfiles when Alpine releases a new patch.
+- Dockerfile comments are mostly French (existing style); new shell code/comments stay English per the split above. Indent shell with 2 spaces.
 - `.dockerignore` excludes `.git`, `.github`, legacy Dockerfiles, and documentation from the build context — keep it current if new files are added at the repo root.

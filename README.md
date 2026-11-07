@@ -33,7 +33,7 @@ Les images publiées et les builds CI utilisent `Dockerfile` avec `ARCH=armv7` o
 | Software | Version |
 |---|---|
 | duplicacy-web | 1.8.3 |
-| duplicacy | 3.2.5 |
+| duplicacy | 3.3.0 |
 
 ## Environment Variables
 

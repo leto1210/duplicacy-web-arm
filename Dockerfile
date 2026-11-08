@@ -27,6 +27,7 @@ ENV TZ="Europe/Paris"
 
 # Installer les logiciels nécessaires
 RUN apk update && \
+    apk upgrade --no-cache && \
     apk add --no-cache bash ca-certificates dbus su-exec tzdata wget
 
 # Déterminer les bonnes URLs en fonction de l'architecture

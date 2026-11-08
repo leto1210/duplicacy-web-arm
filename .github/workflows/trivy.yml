@@ -52,6 +52,7 @@ jobs:
           format: 'sarif'
           output: 'duplicacy-web-arm_trivy-results-${{ matrix.arch }}.sarif'
           severity: 'CRITICAL,HIGH'
+          limit-severities-for-sarif: true # otherwise the SARIF carries every severity
           timeout: 20m # default 5m is too short for the large Go binaries on the ARM runner
 
       - name: Upload Trivy scan results to GitHub Security tab (${{ matrix.arch }})

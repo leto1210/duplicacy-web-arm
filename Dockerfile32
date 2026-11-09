@@ -4,7 +4,7 @@ ARG DUPLICACY_WEB_SHA256_ARM=b1a529eb1f102d3529002eb763f78934df2268c767f610c92e4
 ARG DUPLICACY_SHA256_ARM=cca19e23edd538c14886c2848426c5ff3d42f9562b51527e2ff2a848911d7a94
 
 # Choisir l'image Alpine en fonction de l'architecture
-FROM arm32v7/alpine:3.24.1 AS base-armv7
+FROM arm32v7/alpine:3.24.4 AS base-armv7
 
 # Utiliser l'image appropriée en fonction de $ARCH pour 32 bits
 FROM base-armv7 AS builder-armv7

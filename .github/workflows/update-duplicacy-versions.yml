@@ -164,8 +164,11 @@ jobs:
       - name: Récupérer la dernière version disponible
         id: latest
         shell: bash
+        env:
+          # Authenticated call: anonymous API requests share the runner IP's rate limit (403)
+          GH_TOKEN: ${{ github.token }}
         run: |
-          latestVersion="$(curl -fsSL 'https://api.github.com/repos/gilbertchen/duplicacy/releases/latest' | jq -r '.tag_name' | sed 's/^v//')"
+          latestVersion="$(gh api repos/gilbertchen/duplicacy/releases/latest --jq '.tag_name' | sed 's/^v//')"
           if [ -z "$latestVersion" ] || [ "$latestVersion" = "null" ]; then
             echo "Impossible de récupérer la dernière version Duplicacy CLI" >&2
             exit 1

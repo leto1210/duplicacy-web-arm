@@ -2,8 +2,8 @@
 ARG ARCH=armv7
 ARG DUPLICACY_WEB_SHA256_ARM=b1a529eb1f102d3529002eb763f78934df2268c767f610c92e451e7a50035b8d
 ARG DUPLICACY_WEB_SHA256_ARM64=ff611509d8d1ea7f5382a1f2681b597a64a4d845056b164c935bfdd217320836
-ARG DUPLICACY_SHA256_ARM=cca19e23edd538c14886c2848426c5ff3d42f9562b51527e2ff2a848911d7a94
-ARG DUPLICACY_SHA256_ARM64=0e28cc3d943b2357136364d73a66ac82309ed9ecc36a3f9fea64b23ca1f8427c
+ARG DUPLICACY_SHA256_ARM=55322e83da1f5813466d8ed1f99072435482b7ec64c793655cce3fe10c0b1c60
+ARG DUPLICACY_SHA256_ARM64=7f6db2c7fc2322f33b960ea714f166f199a148155e4b5cd6ad8958768c3f7757
 
 # Choisir l'image Alpine en fonction de l'architecture
 FROM arm32v7/alpine:3.24.4 AS base-armv7
@@ -17,7 +17,7 @@ LABEL org.label-schema.vcs-url="e.g. https://github.com/leto1210/duplicacy-web-a
 
 # Définit les versions des logiciels
 ENV DUPLICACY_WEB_VERSION=1.8.3 \
-    DUPLICACY_VERSION=3.3.0
+    DUPLICACY_VERSION=3.3.1
 
 # Set to actual USR_ID and GRP_ID of the user this should run under
 # Uses root by default, unless changed
